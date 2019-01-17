@@ -1,0 +1,502 @@
+ #include <math.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <cfortran.h>
+ #include <hbook.h>
+ #include <kernlib.h>
+
+ #include "lorlib.h"
+ #include "kinema.h"
+ #include "anap4.h"
+
+ #define MAX_TDC 1000
+ #define N_DUP 16
+ #define N_TDC1 64
+const long int TIME_H = 2000;
+const long int TIME_L = -2000;
+
+ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
+   int i,ip,j,k,num;
+   int ii,jj;
+   double tmp;
+   int segsize,ids,ips,ipsn,count;
+   //  unsigned short qdc[N_QDC];
+   unsigned short tdc[N_TDC][N_DUP];
+   unsigned int adc[N_ADC_MOD][N_ADC];
+   unsigned int adc_al[N_ADC_MOD][N_ADC];//aligned channel
+   //  double qdcc[N_QDC];
+   double tdcc[N_TDC][N_DUP];
+   double adcc[N_ADC_MOD][N_ADC];
+   double adcc_al[N_ADC_MOD][N_ADC];//aligned channel
+   const double tpar[N_TDC][2]={{0.0, 0.01}, {0.0, 0.01},{0.0, 0.01},{0.0, 0.01}};
+
+   double t_measure;
+   int tdc_cnt[N_DUP]; //counts of dupulicates
+   char tdc_hit[N_TDC1]; //wheather the channel has signal
+   char tdc_nn[2][2]; //rearenge hits [right/left][x/y]
+   char tmpbuf[200];
+   /* variables for v1190 */
+   int ilt; /* Leading or Trailing */
+   int ichan;
+   int ihit=0;
+   unsigned int idata;
+   unsigned int raw_v1190[2][MAX_TDC];
+   unsigned int tzero;
+   /************* Clear Event Buffer *****************/
+   /*
+   for(i=0;i<N_QDC;i++) {
+     qdc[i]=0;
+     qdcc[i]=0.;
+   }
+   */
+   for(i=0;i<N_TDC;i++){
+     for(j=0;j<N_DUP;i++){
+     tdc[i][j]=0;
+     tdcc[i][j]=0.;
+     }
+   }
+   for(i=0;i<N_ADC;i++){
+     for(j=0;j<N_ADC_MOD;j++){
+       adc[j][i]=0;
+       adcc[j][i]=0.;
+       adc_al[j][i]=0;
+       adcc_al[j][i]=0;
+     }
+   }
+   count=0;
+
+   /************* Clear Event Buffer *****************/
+  ip=0;
+  while(ip<evtlen){  
+    int tmpdat,tmpch,tmpnwd;
+    int ily=0; /* Data Layer */
+               /* 0: Grobal Header, Global Trailer */
+	       /* 1: TDC Header, TDC Trailer */
+               /* 2: TDC Data */
+    
+    int scaid;
+
+    /** Segment Header ************/
+    segsize=rawbuf[ip++];
+    ipsn=ip+segsize-1;
+    ids=rawbuf[ip++]; // ids -> segment id
+    
+#if _DEBUG
+    ips=0;
+    printf(" New Seg %d\n",ids);
+#endif    
+    while(ip<ipsn){ /*** Segment loop ***/
+      switch(ids){
+      case 1:  /*** MADC32 No.1 ****/     
+	tmpdat=rawbuf[ip++];
+	tmpdat+=(rawbuf[ip++]*0x10000);
+	if((tmpdat & 0xc0000000)==0x40000000){ /* Header */
+	  unsigned int tmpmod,tmpnwd;
+	  tmpmod=((tmpdat>>16)&0x00ff);
+	  tmpnwd=(tmpdat&0x3ff);
+#if _DEBUG
+	  printf("  MADC32:ID %02x:Count %2d\n",tmpmod,tmpnwd);
+#endif
+	  for(i=0;i<tmpnwd;i++){
+	    tmpdat=rawbuf[ip++];
+	    tmpdat+=(rawbuf[ip++]*0x10000);
+	    switch(tmpdat & 0xc0000000){
+	    case 0x0000000: /* Data */
+	      if((tmpdat & 0xffe00000)==0x04000000) { /* Data event */
+		tmpch=(tmpdat & 0x01f0000) >> 16;
+		//tmpch += (tmpmod&0x1)*32;
+		//adc[tmpch]=(tmpdat & 0xffff);
+		adc[(tmpmod&0x1)][tmpch]=(tmpdat & 0xffff);
+#if _DEBUG
+		printf("  ADC:0x%08x:  Ch:%2d  Adc:%4d\n", 
+		       tmpdat,tmpch,adc[tmpch]);
+		/*
+		  sprintf(tmpbuf,"ADC:   %2d: %08x  ch:%02d  adc:%4d\n",
+		  i, tmpdat,tmpch, qdc[i]);
+		  dumpmsg(tmpbuf);*/
+#endif
+	      }
+	      else {
+		printf("  MADC32: Non event data (0x%08x).\n",tmpdat);
+	      }
+	      break;
+	    case 0xc0000000: /* End of Event data */
+#if _DEBUG
+	      printf("  ADC:0x%08x:  Timestamp:0x%08x\n",
+		     tmpdat,(tmpdat & 0x3fffffff));
+#endif
+	      break;
+	    default:
+	      printf("  MADC32:Unknown data format (%08x)\n",tmpdat);
+	    }
+	  }
+	}
+	else{
+	  printf("  MADC32:Wrong header word (%08x)\n",tmpdat);
+	}
+	break;
+
+      case 2: /******** v1190 *********/
+	tmpdat=rawbuf[ip++];
+	tmpdat+=(rawbuf[ip++]*0x10000);
+	switch((tmpdat>>27)&0x1f){
+	case 0x08:  /* Global Header */
+	  ily=1;
+	  break;
+	case 0x10: /* Global Trailer */
+	  if(ily!=1){
+	    printf("V1190 Global Trailer error (Ly:%d).\n",ily);
+	  }
+	  ily=0;
+	  break;
+	case 0x11: /* Extended Trigger Time Tag */
+	  break;
+	case 0x01: /* TDC Header */
+	  if(ily!=1){
+	    printf("V1190 TDC Header error (Ly:%d).\n",ily);
+	  }
+	  ily=2;
+	  break;
+	case 0x00: /* TDC Measurement */
+	  if(ily!=2){
+	    printf("V1190 TDC Data error (Ly:%d).\n",ily);
+	    return(-1);
+	  }
+	  ilt=(tmpdat>>26)&0x1;
+	  ichan=(tmpdat>>19)&0x7f;
+	  raw_v1190[0][ihit]=ichan;
+	  idata=tmpdat&0x7ffff;
+	  raw_v1190[1][ihit++]=idata;
+	  if(ichan==V1190_REF && ilt==0) tzero=idata; //reference timing e.g. RF etc...
+	  if(ihit==MAX_TDC){
+	    fprintf(stderr, "Number of hit of V1190 reaches the maximum number.\n");
+	    return -1;
+	  }
+	  break;
+	case 0x04: /* TDC Error */
+	  printf(" V1190 TDC ERR\n");
+	  break;
+	case 0x03: /* TDC Trailer */
+	  if(ily!=2){
+	    printf("V1190 TDC Trailer error (Ly:%d).\n",ily);
+	  }
+	  ily=1;
+	  break;
+	default:
+	  printf(" V1190:%08x Unknown format.\n",tmpdat);
+	}
+	break;
+
+	
+      /********* V560 **********/
+      case 3:
+//	if(scaid<SCA_CH){
+//	  tmpdat = rawbuf[ip++];
+//	  tmpdat += (rawbuf[ip++]*0x10000);
+//	  dat->sca[scaid++]=tmpdat;
+//	}
+	for(scaid=0;scaid<SCA_CH;scaid++){
+	  tmpdat = rawbuf[ip++];
+	  tmpdat += (rawbuf[ip++]*0x10000);
+	  dat->sca[scaid] = tmpdat;
+	}
+	break;
+
+
+
+
+      default:
+	ip++;ip++; /* Skip segment ids != 1 */
+      }
+    }
+  }
+
+ /**** Decode Event Data Above***************/
+
+ /****adc channel align HERE****/
+   for(j=0;j<N_ADC_MOD;j++){
+     for(i=16;i<24;i++){
+       adc_al[j][i] = adc[j][39-i];
+       adcc_al[j][i] = adcc[j][39-i];
+     }
+     for(i=24;i<32;i++){
+       adc_al[j][i] = adc[j][55-i];
+       adcc_al[j][i] = adcc[j][55-i];
+     }
+   }
+ /****adc channel align ABOVE****/
+
+
+   /**** Data Analysis Here ***************/
+
+   /* Energy calibration */
+   /*
+   for(i=0;i<N_QDC;i++){
+     qdcc[i]=1.*qdc[i];
+   }
+   */
+   /* v1190 data rearrangement */
+      
+  for(ihit=0; ihit<MAX_TDC;ihit++){
+    t_measure=raw_v1190[1][ihit]-tzero; 
+    //    if(t_measure<TIME_H && t_measure>TIME_L){
+
+      i=raw_v1190[0][ihit];
+      if(tdc_cnt[i]<N_DUP){
+	tdc[i][tdc_cnt[i]++]=t_measure;
+      }  
+      tdc_hit[i]++;
+      //    }
+  }
+
+
+   /* time calibration */
+   for(i=0;i<N_TDC;i++) {
+     for(j=0;j<N_DUP;j++){
+     tdcc[i][j]=(tdc[i][j]-tpar[i][0])*tpar[i][1];
+     }
+   }
+
+
+   /* ADC calibration */
+   for(i=0;i<N_ADC;i++){
+     for(j=0;j<N_ADC_MOD;j++){
+       adcc[j][i]=(double)adc[j][i];
+     }
+   }
+
+   /**** Data Analysis Above ***************/
+
+   /*********** Booking here **********/
+
+ #if 0  
+   /*
+   for(i=0;i<N_QDC;i++){
+     HF1(10+i,qdc[i],1.0);
+   }
+   */
+/*
+   for(i=0;i<N_TDC;i++){
+     HF1(20+i,tdc[i],1.0);
+   }
+*/
+ #endif
+
+ /******************day0108*********************/
+
+ /*memo 
+ silicon number (0,1)=(right,left)
+ silicon strip(ch) (0-15ch;x-axis,16-31ch;y-axis)
+ N_ADC_MOD: 2
+ N_ADC: 32
+ adc[][]:adc channel
+ adcc[][]:calibrated adc channel
+ adc_al[][]:adc aligned channel
+ adcc_al[][]:calibrated and aligned adc channel
+ */
+
+ //*********** reading adc ******************//
+   for(i=0;i<N_ADC;i++){
+     HF1(500+i,adcc[0][i],1.0); //each right Si strip
+     HF1(532+i,adcc[1][i],1.0); //each left Si strip
+     HF1(600+i,adcc_al[0][i],1.0); //aligned strip
+     HF1(632+i,adcc_al[1][i],1.0);
+
+     HF1(170,adcc[0][i],1.0); //right Si strip
+     HF1(171,adcc[1][i],1.0); //left Si strip
+     HF1(172,adcc_al[0][i],1.0);
+     HF1(173,adcc_al[1][i],1.0);
+   }
+
+
+
+
+ //**************ADC channel check***********//
+   for(j=0;j<N_ADC_MOD;j++){
+     for(i=0;i<N_ADC;i++){
+       HF2(10+j,i,adcc[j][i],1.0); //right/left strip vs adc
+     }
+   }
+   
+ //************TDC channel check***********//
+   for(ihit=0; ihit<MAX_TDC;ihit++){
+     i=raw_v1190[0][ihit]; 
+     HF1(12,i,1.0); //check signals from all channel
+   }
+   for(i=0;i<N_DUP;i++){
+     for(j=0;j<N_TDC;j++){
+       HF1(700+j,tdcc[j][i],1.0); //check signals from each channel
+     }
+   }
+
+ 
+
+
+   /* int adc_cc[N_ADC_MOD][N_ADC]; /\*count signals of each channels*\/ */
+   /*                               /\* [][0-15]: x-axis*\/ */
+   /*                               /\* [][16-31]: y-axis*\/ */
+   /* int adcc2[N_ADC_MOD][2]; /\*count signals of x/y-axis*\/ */
+   /*                          /\* [][0]: x*\/ */
+   /*                          /\* [][1]: y*\/ */
+   /* double adc_th; //adc threshold */
+   double adc2[N_ADC_MOD][2][16]; //[][0][]:x-axis
+                                //[][1][]:y-axis
+
+   //devide adc into x and y axis    
+   for(i=0;i<2;i++){ 
+     for(j=0;j<N_ADC;j++){
+       adc2[i][(int)j/16][j%16]=adcc_al[i][j];
+     }
+   }
+
+
+   //devide tdc hits into [2][2]
+
+   for(i=0;i<N_TDC1;i++){
+     tdc_nn[(int)i/32][i/16]=tdc_hit[i];
+   }
+
+   for(i=0;i<N_TDC1;i++){
+     if(tdc_hit[i]>0){
+       HF1(20+(int)i/16,i%16,1.0); //tdc hits
+     }
+   }
+
+   /****************** deta analyze***********************/
+   
+   //make vector of Silicon pixcs//
+
+
+
+
+
+   char adc_ch[2][16]; //temporary adc channels
+   char pixx[N_ADC_MOD][16]; //temporary coordinates
+   char pixy[N_ADC_MOD][16];
+   char hit_c[N_ADC_MOD]; //temporary counts of hitted Si
+   unsigned char p2=0; //the counts of hitted on both Si 
+   unsigned char pn=0; //particle number
+   unsigned char hit_ch[N_ADC_MOD][MAX_TDC][2]; // coordinates against pn
+
+   for(i=0;i<2;i++){ //loop module 0,1
+
+     for(j=0;j<32;j++){
+       adc_ch[(int)j/16][j%16]=j%16;
+       pixx[j/16][j%16]=-1;
+     }
+     
+     unsigned char p=0;
+     p= (tdc_nn[i][0]>tdc_nn[i][1]) ? tdc_nn[i][0]-tdc_nn[i][1] : tdc_nn[i][1]-tdc_nn[i][0];
+     
+     switch (p){
+       case 0: //same counts
+	 hit_c[i]=tdc_nn[i][0];
+	 for(j=0;j<N_ADC;j++){
+	   if(tdc_hit[32*i+j]>0){ //select ch
+	       adc2[i][(int)j/16][j%16]=adcc_al[i][j];
+	   }
+	 }
+	 for(j=0;j<N_ADC;j++){ //rearrenge ch by E
+	   for(k=j%16+1;k<16;k++){
+	     if(adc2[i][(int)j/16][j%16]<adc2[i][(int)j/16][k]){
+	       tmp=adc2[i][(int)j/16][j%16];
+	       num=adc_ch[j/16][j%16];
+	       adc2[i][(int)j/16][j%16]=adc2[i][(int)j/16][k];
+	       adc_ch[(int)j/16][j%16]=adc_ch[(int)j/16][k];
+	       adc2[i][(int)j/16][k]=tmp;
+	       adc_ch[(int)j/16][k]=num;
+	     }
+	   }
+	 }
+	 for(j=0;j<16;j++){
+	   while(tdc_hit[32*i+adc_ch[i][j]]>0){	     
+	     hit_ch[i][pn][0]=adc_ch[0][j];
+	     hit_ch[i][pn][1]=adc_ch[1][j];
+	     pn++;
+	   }
+	   for(pn=0;pn<16;pn++){
+	     HF2(15+i,hit_ch[i][pn][0],hit_ch[i][pn][1],1.0);
+	   }
+	 }
+	 break;
+       }
+   }
+   if(hit_c[0]==hit_c[1]){
+     p2=hit_c[0];
+     switch (p2){
+     case 3: //hitted 3 particle on each Si
+       for(pn=0;pn<3;pn++){
+	 HF2(33000+pn+100*i,hit_ch[i][pn][0],hit_ch[i][pn][1],1.0);
+       }
+       
+     }
+   }
+   
+
+ /* for(i=0;i<N_ADC_MOD;i++){ */
+ /*   for(j=0;j<2;j++){ */
+ /*     for(k=0;k<16;k++){ */
+
+ /* 	 HF1(20+i,k+j*16,1.0); //count adc signals of each channel */
+ /* 	   adcc2[i][j]++; */
+ /*       } */
+ /*       else{ */
+ /* 	 adc[j][0]++; //count signals of x */
+ /* 	 HF1(22+j,adc_cc[j][i],1.0); //count signals of x/y */
+ /*       } */
+ /*     } */
+ /*     if(adc_cc[j][0]==adc_cc[j][1]){ */
+ /*       for(i=0;i<16;i++){ */
+ /* 	 for(k=i+1;k<16;k++){ //align adcc against enegy */
+ /* 	   if(adcc[j][i]>adcc[j][j]){ */
+ /* 	     tmp=adcc[j][i]; */
+ /* 	     adcc[j][i]=adcc[j][k]; */
+ /* 	     adcc[j][i]=tmp; */
+ /* 	   } */
+ /* 	 } */
+ /*       } */
+ /*     } */
+ /*   } */
+ /* } */
+
+
+
+
+
+
+
+//reading adc real channel asign//
+/*  for(i=0;i<N_ADC;i++){
+    for(j=0;j<N_ADC_MOD;j++){
+      HF1(100*(j+1+N_ADC_MOD)+i,adc_re[j][i],1.0);
+    }
+  }
+ 
+  for(j=0;j<N_ADC_MOD;j++){
+    nx[j] = 0;
+    ny[j] = 0;
+    for(i=0;i<N_STRIP;i++){
+      if(adcc_re[j][i]>adc_thre){
+	nx[j] = nx[j]+1;
+      }
+      else nx[j]= nx[j];
+    }
+    for(i=N_STRIP;i<N_ADC;i++){
+      if(adcc_re[j][i]>adc_thre){      
+	ny[j] = ny[j]+1;
+      }
+      else ny[j] = ny[j];
+    }
+    HF2(500,nx[j],ny[j],1.0);
+  }
+
+*/
+
+
+  
+
+
+  /*********** Booking Above **********/
+  return(ip);
+}
