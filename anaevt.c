@@ -247,8 +247,8 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 
   /* ADC calibration */
   FILE *fright,*fleft;
-  fright = fopen("../ADC_calib_mod00.dat","r");
-  fleft = fopen("../ADC_calib_mod01.dat","r");
+  fright = fopen("../calib/ADC_calib_mod00.dat","r");
+  fleft = fopen("../calib/ADC_calib_mod01.dat","r");
   if(fright==NULL){
     puts("calib0 file cannot open");
     return -1;
