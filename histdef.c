@@ -26,7 +26,7 @@ int histdef(){
       sprintf(hnam,"calib-ADC %s ch:%02d",mod[j],i);
       //      HBOOK1(700+N_ADC*j+i,hnam,2048,0.,32.,0);
            sprintf(hnam,"aligned calib-ADC mod:%1d ch:%02d",j,i);
-           HBOOK1(800+N_ADC*j+i,hnam,2048,0.,64.,0);
+           HBOOK1(800+N_ADC*j+i,hnam,2048,-10.,64.,0);
     }
     sprintf(hnam, "ADC ch-monitor %s",mod[j]);
     HBOOK2(10+j,hnam,32,0.,32.,128,0.,4096.,0);

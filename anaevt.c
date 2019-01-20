@@ -45,9 +45,19 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   unsigned int raw_v1190[2][MAX_TDC];
   int tzero;
   long int t_measure;
-  int vch;
-  double dsl,dseg;
+  /*variables and array for ADC calibration*/
+  int vch,vch_am;
+  //f(x)=dsl*x+dseg x:ADC
+  double vsl,vseg; // buffer vsl:slope from ADC to pulse, vseg:segment from ADC to pulse
+  double vped,vAm,vpedsig,vAmsig;//buffer for Am dat
+  double EAm = 5.48;
   int ir,il;
+  int ichc[N_ADC_MOD][N_DUP];//ch array for calib [right or left][0~31 (ch)]
+  double dsl[N_ADC_MOD][N_DUP];//slope array for calib [right or left][0~31 (ch)]
+  double dseg[N_ADC_MOD][N_DUP];//segment array for calib [right or left][0~31 (ch)]
+  double dped[N_ADC_MOD][N_DUP];//241Ampedestal ADC array for calib [right or left][0~31 (ch)]
+  double dAm[N_ADC_MOD][N_DUP];//241Am ADC array for calib [right or left][0~31 (ch)]
+  
   int sicnt[2];
   /************* Clear Event Buffer *****************/
   /*
@@ -246,9 +256,35 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   
 
   /* ADC calibration */
-  FILE *fright,*fleft;
-  fright = fopen("../calib/ADC_calib_mod00.dat","r");
-  fleft = fopen("../calib/ADC_calib_mod01.dat","r");
+
+  /* FILE *fright,*fleft; */
+  /* fright = fopen("../calib/ADC_calib_mod00.dat","r"); */
+  /* fleft = fopen("../calib/ADC_calib_mod01.dat","r"); */
+  /* if(fright==NULL){ */
+  /*   puts("calib0 file cannot open"); */
+  /*   return -1; */
+  /* } */
+  /* if(fleft==NULL){ */
+  /*   puts("calib1 file cannot open"); */
+  /*   return -1; */
+  /* } */
+  /* while(fscanf(fright,"%d %lf %lf",&vch,&dsl,&dseg)!=EOF){ */
+  /*   adcc[0][vch-101] = adc[0][vch-101]*dsl+dseg; */
+  /* } */
+  /* while(fscanf(fleft,"%d %lf %lf",&vch,&dsl,&dseg)!=EOF){ */
+  /*   adcc[1][vch] = adc[1][vch]*dsl+dseg; */
+  /* } */
+  /* fclose(fright); */
+  /* fclose(fleft); */
+
+  //calibration by data after beam time
+  //I cant think segment of Am
+   FILE *fright,*fleft;
+   FILE *frightAm,*fleftAm;
+  fright = fopen("../calib/after_result00.txt","r");
+  fleft = fopen("../calib/after_result01.txt","r");
+  frightAm = fopen("../calib/Am_calb00.txt","r");
+  fleftAm = fopen("../calib/Am_calb01.txt","r");
   if(fright==NULL){
     puts("calib0 file cannot open");
     return -1;
@@ -257,14 +293,46 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
     puts("calib1 file cannot open");
     return -1;
   }
-  while(fscanf(fright,"%d %lf %lf",&vch,&dsl,&dseg)!=EOF){
-    adcc[0][vch-101] = adc[0][vch-101]*dsl+dseg;
+   if(frightAm==NULL){
+    puts("Amcalib0 file cannot open");
+    return -1;
   }
-  while(fscanf(fleft,"%d %lf %lf",&vch,&dsl,&dseg)!=EOF){
-    adcc[1][vch] = adc[1][vch]*dsl+dseg;
+  if(fleftAm==NULL){
+    puts("Amcalib1 file cannot open");
+    return -1;
   }
+
+  //input calib data from txt file
+  while(fscanf(fright,"%d %lf %lf",&vch,&vsl,&vseg)!=EOF){
+    ichc[0][vch]=vch;dsl[0][vch]=vsl;dseg[0][vch]=vseg;
+  }
+  while(fscanf(fleft,"%d %lf %lf",&vch,&vsl,&vseg)!=EOF){
+    ichc[1][vch]=vch;dsl[1][vch]=vsl;dseg[1][vch]=vseg;
+  }
+  vch_am=0;
+  while(fscanf(frightAm,"%lf %lf %lf %lf",&vped,&vpedsig,&vAm,&vAmsig)!=EOF){
+    dped[0][vch_am]=vped;dAm[0][vch_am]=vAm;
+    vch_am++;
+  }
+  vch_am=0;
+   while(fscanf(fleftAm,"%lf %lf %lf %lf",&vped,&vpedsig,&vAm,&vAmsig)!=EOF){
+    dped[1][vch_am]=vped;dAm[1][vch_am]=vAm;
+    vch_am++;
+  }
+  
   fclose(fright);
   fclose(fleft);
+  fclose(frightAm);
+  fclose(fleftAm);
+  //ADC calib start
+  //adcc=f(adc)/f(adc of 5.48MeV)*5.48
+  for(j=0;j<N_ADC_MOD;j++){
+    for(i=0;i<N_ADC;i++){
+      adcc[j][i]=((double)adc[j][i]*dsl[j][i]+dseg[j][i])\
+	           /(dAm[j][i]*dsl[j][i]+dseg[j][i])\
+	          *EAm;
+    }
+  }
 
   /**** adc channel align here ****/
   for(j=0;j<N_ADC_MOD;j++){
