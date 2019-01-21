@@ -1,3 +1,18 @@
-*** Begin of history file: Mon Jan 21 08:16:50 2019
+*** Begin of history file: Mon Jan 21 08:57:25 2019
+h/file 104 hb/0104.hb
+h/pl 104
+h/pl 800
+exe ../../../tools/kumac/show1 800 0. 10.
+h/file 119 hb0019.hb
+h/file 119 hb/0019.hb
+cd //lin119
+cd //lun119
+cd
+ls
+cd //119
+h/pl 800
+h/pl 800(1.:10.)
+vlocate !
+vlocate ! it
 exit
-*** End   of history file: Mon Jan 21 08:16:57 2019
+*** End   of history file: Mon Jan 21 10:31:49 2019
