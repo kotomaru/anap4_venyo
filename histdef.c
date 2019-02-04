@@ -28,6 +28,8 @@ int histdef(){
       HBOOK1(800+N_ADC*j+i,hnam,2048,-10.,64.,0);
       sprintf(hnam,"calib-ADC %s ch:%02d with TDC Gate",mod[j],i);
       HBOOK1(900+N_ADC*j+i,hnam,2048,-10.,64.,0);
+      sprintf(hnam,"calib-ADC %s ch:%02d case not adcNo1",mod[j],i);
+      HBOOK1(400+N_ADC*j+i,hnam,2048,-10.,64.,0);
     }
     sprintf(hnam, "ADC ch-monitor %s",mod[j]);
     HBOOK2(10+j,hnam,32,0.,32.,128,0.,4096.,0);

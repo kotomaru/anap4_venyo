@@ -259,10 +259,10 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   /* ADC calibration */
 
   FILE *fright,*fleft;
-  //  fright = fopen("../calib/Am_result00.txt","r");
-  //fleft = fopen("../calib/Am_result01.txt","r");
-  fright = fopen("../calib/ADC_calib_mod00_ver1.dat","r");
-  fleft = fopen("../calib/ADC_calib_mod01_ver1.dat","r");
+  fright = fopen("../calib/Am_result00.txt","r");
+  fleft = fopen("../calib/Am_result01.txt","r");
+  // fright = fopen("../calib/ADC_calib_mod00_ver1.dat","r");
+  //fleft = fopen("../calib/ADC_calib_mod01_ver1.dat","r");
   if(fright==NULL){
     puts("calib0 file cannot open");
     return -1;
@@ -373,7 +373,9 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   /***No.1 adc search here***/
   for(i=0;i<N_ADC_MOD;i++){
     for(j=0;j<N_ADC;j++){
-      if(adcc_al)
+      if(adcc_al[i][j]>adccNo1[i]){
+	adccNo1[i]=adcc_al[i][j];
+      }
     }
   }
   
@@ -692,6 +694,9 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	  HF1(900+i,adcc_al[(int)i/32][(int)i%16],1.0);
 
 	  /***except closs talk ***/
+	  if(adcc_al[(int)i/32][(int)i%16] != adccNo1[(int)i/32]){
+	    HF1(400+i,adcc_al[(int)i/32][(int)i%16],1.0);
+	}
 	  if(adcc_al[(int)i/32][(int)i%16]>adccmin
 	     && adcc_al[(int)i/32][(int)i%16]<adccmax){
 	    HF2(2100+i,tdc_al[i][0]-tzero,adcc_al[(int)i/32][(int)i%16],1.0);
