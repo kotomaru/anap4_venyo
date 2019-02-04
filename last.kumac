@@ -1,0 +1,227 @@
+*** Begin of history file: Fri Feb  1 15:26:24 2019
+h/file 41 hb/0041_0201.hb
+h/li
+h/pl 1000
+h/pl 50010
+opt static
+h/pl 1000
+h/pl 50010
+h/pl 50012
+h/pl 50012 colz
+h/pl 50011
+h/pl 50011
+h/pl 50012 colz
+close 41
+h/file 41 hb/0041_0201.hb
+h/pl 50000
+h/pl 50010
+h/pl 50000
+h/pl 50001
+h/pl 50010
+h/pl 1000
+h/file 43 hb/0043_0201.hb
+h/pl 1000
+h/file 45 hb/0045.hb
+h/pl 1000
+h/file 41 hb/0041_0204.hb
+close 41
+h/file 41 hb/0041_0204.hb
+h/pl 50001
+h/pl 50011
+h/pl 50012
+h/pl 50010
+h/fit 50012(7.:9.) g
+h/fit 50012(7.,9.) g
+h/fit 50010(7.:9.) g
+h/del *
+h/pl 50010
+h/pl 50011
+vlocate x y !
+vec/pri x y
+h/file 43 hb/0043_0204.hb
+close 43
+h/file 43 hb/0043_0204.hb
+h/file 43 hb/0043.0204.hb
+h/pl 50011
+h/pl 50012
+h/pl 50012 colz
+h/pl 50012(0.:100,0.:100.) colz
+h/pl 50012(0.:100.,0.:100.) colz
+h/file 45 hb/0045_0204.hb
+close 45
+h/file 45 hb/0045_0204.hb
+h/pl 50012
+h/pl 50011
+h/pl 50010
+h/file 456 hb/0046_0204.hb
+close 46
+h/file 46 hb/0046_0204.hb
+h/pl 50010
+h/pl 50011
+h/file 47 hb/0047_0204.hb
+h/pl 50011
+h/file 47 hb/0047_0204.hb
+h/del *
+h/pl 50011
+h/pl 50010
+h/pl 50012
+h/pl 50000
+h/pl 50001
+h/del *
+h/pl 50001
+h/pl 50002
+h/pl 50010
+cd //lun43
+h/pl 50010
+h/pl 50011
+h/pl 50010
+vlocate x y !
+vec/pri x y
+cd
+cd //lun45
+h/pl 50010
+h/pl 50011
+zone 1 2
+h/pl 50010
+h/pl 50011
+cd //lun43
+h/pl 50010
+h/pl 50011
+close 45
+close 46
+close 47
+h/file 47 hb/0047_0204.hb
+h/file 46 hb/0046_0204.hb
+h/file 45 hb/0045_0204.hb
+h/del *
+h/pl 50010
+h/pl 50011
+cd //lun46
+h/pl 50010
+h/pl 50011
+cd //lun47
+h/pl 50010
+h/pl 50011
+close 41
+h/file 41 hb/0041_0204.hb
+h/pl 5000
+h/pl 50000
+h/pl 50001
+h/pl 50010
+h/pl 50011
+h/li
+h/pl 800
+opt logy
+h/pl 800
+opt liny
+h/pl 801
+h/pl 802
+h/pl 803
+h/pl 804
+h/pl 805
+h/del *
+h/pl 805
+zone
+h/pl 805
+h/pl 805(0.)
+h/pl 805(0.:)
+h/pl 900
+h/pl 100
+h/pl 1000
+cd
+cd //lun43
+h/pl 900
+h/pl 800
+cd //lun43
+zone 1 2
+h/pl 800
+h/pl 900
+h/pl 800
+cd //lun41
+h/pl 800
+cd //lun45
+h/pl 800
+cd //lun46
+h/pl 800
+cd //lun47
+h/pl 800
+zone
+h/pl 800
+h/pl 800(0.1:)
+h/file 51 hb/0041_0201.hb
+h/pl 800
+zone 1 2
+h/pl 800
+cd //lun41
+h/pl 800
+cd //lun 43
+cd //lun43
+h/pl 800
+zne
+zone
+h/pl 800(0.:10.)
+opt logy
+h/pl 800(0.:10.)
+h/pl 800(0.:10.)
+h/pl 800
+h/pl 801
+opt lony
+opt liny
+exe ../../../tools/kumac/show1 800
+h/pl 800
+h/pl 800(-0.7:0.7)
+h/pl 800(-0.2:0.2)
+exe ../../../tools/kumac/show1 800 -0.2 0.2
+cd
+h/file 53 hb/0043_02042.hb
+h/pl 50000
+h/pl 50001
+h/pl 50010
+h/pl 50011
+h/pl 50011
+h/pl 50010
+h/pl 50011
+h/pl 50012
+h/pl 50010
+h/li
+h/pl 10003
+h/pl 10003 colz
+h/pl 10013 colz
+h/pl 10003 colz
+cd //lun 41
+cd //lun41
+h/pl 10003 colz
+h/pl 10003 colz
+cd //lun45
+h/pl 10003 colz
+h/pl 10013 colz
+h/pl 10013 colz
+h/pl 10003 colz
+cd //lun41
+h/pl 10003 colz
+cd //lun53
+h/pl 10003 colz
+h/pl 10013 colz
+h/pl 10003 colz
+close 43
+h/file 43 hb/0043_0204.hb
+h/pl 400
+h/pl 800
+h/pl 400
+h/pl 401
+zone 1 2
+h/pl 80,400
+h/pl 80,400
+h/pl 800,400
+h/pl 801,401
+h/pl 801(-1.:15.),401(-1.:15.)
+h/pl 801(-1.:10.),401(-1.:10.)
+exe ../../../tools/kumac/show1 400
+opt logy
+exe ../../../tools/kumac/show1 400
+exe ../../../tools/kumac/show_zone 800 400
+exe ../../../tools/kumac/show_zone 800 400 -0.1 1.
+h/li
+h/pl 50010
+opt liny
+*** End   of history file: Mon Feb  4 13:34:13 2019
