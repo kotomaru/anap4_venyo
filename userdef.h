@@ -6,3 +6,4 @@
 #define N_TDC 128
 #define N_USE 3
 #define V1190_REF 127
+#define N_TDC1 64 //without rf & ref

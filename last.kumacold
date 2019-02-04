@@ -1,18 +1,152 @@
-*** Begin of history file: Mon Jan 21 08:57:25 2019
-h/file 104 hb/0104.hb
-h/pl 104
-h/pl 800
-exe ../../../tools/kumac/show1 800 0. 10.
-h/file 119 hb0019.hb
-h/file 119 hb/0019.hb
-cd //lin119
-cd //lun119
-cd
-ls
-cd //119
-h/pl 800
-h/pl 800(1.:10.)
-vlocate !
-vlocate ! it
-exit
-*** End   of history file: Mon Jan 21 10:31:49 2019
+*** Begin of history file: Wed Jan 30 15:27:37 2019
+h/file 43 hb/0043_0130.hb
+h/pl 2100
+opt logz
+h/pl 2100
+opt linz
+h/pl 2100
+exe ../../../tools/kumac/show2 2100
+h/pl 33
+exe ../../../tools/kumac/show1 900
+opt logy
+exe ../../../tools/kumac/show1 900 0. 10.
+close 43
+h/file 43 hb/0043_0130.hb
+exe ../../../tools/kumac/show2 2100
+exe ../../../tools/kumac/show1 1100
+opt liny
+exe ../../../tools/kumac/show1 1100
+exe ../../../tools/kumac/show1 1100 2000. 6000.
+close 43
+h/li
+h/del *
+h/li
+h/file 43 hb/0043_0130.hb
+h/li
+h/pl 10013
+opt static
+h/pl 10003
+h/pl 10013
+h/pl 50010
+h/pl 50000
+h/pl 50010
+h/pl 50000
+h/pl 50011
+h/pl 50000
+h/pl 50012
+h/pl 50002
+h/pl 50002
+h/pl 50012
+h/file 43 hb/0043_0130.hb
+close 43
+h/file 43 hb/0043_0130.hb
+h/pl 50012
+h/pl 50002
+h/pl 50002
+h/pl 50002 lego
+h/pl 50012 lego
+h/pl 50012(0.:16.,0.:16.) lego
+close 43
+h/file 43 hb/0043_0130.hb
+h/pl 50002
+h/file 43 hb/0043_0130.hb
+h/del *
+h/pl 50002
+h/pl 50012
+h/pl 50002
+h/pl 50012
+h/pl 50002
+close 43
+h/del *
+h/file 43 hb/0043_0130.hb
+h/pl 50002
+h/pl 50012
+h/pl 50012 colz
+h/pl 50002
+h/pl 50012
+h/pl 50002
+h/pl 50002
+h/pl 50012
+close 43
+h/file 43 hb/0043_0201.hb
+h/li
+h/pl 34
+h/pl 34 box
+h/pl 34
+h/pl 34 colz
+h/pl 34
+h/pl 34(:,3.:)
+close 43
+h/file 43 hb/0043_0201.hb
+h/pl 34
+h/pl 34 colz
+h/pl 34
+h/pl 34(3.:3.,4.:4.)
+h/pl 34(3.:3.,4.:4.)
+close 43
+h/file 43 hb/0043_0201.hb
+h/pl 34
+h/del *
+h/pl 34
+h/pl 35
+h/pl 34
+h/pl 35
+h/pl 35(3.:3.,4.:4.)
+h/pl 35(3.:4.,3.:4.)
+h/pl 35(3.:4.,3.:4.)
+h/pl 35(3.:5.,3.:4.)
+h/pl 35(3.:3.,3.:3.)
+h/pl 35(3.:3.,3.:3.) colz
+h/pl 35(3.:3.,3.:3.)
+h/pl 35(3.:,3.:)
+close 43
+h/file 43 hb/0043_0201.hb
+h/del *
+h/pl 50002
+h/pl 50012
+opt static
+h/pl 50012 colz
+h/pl 35(3.:,3.:)
+close 43
+h/file 43 hb/0043_0201.hb
+h/pl 35(3.:,3.:)
+close 43
+h/file 43 hb/0043_0201.hb
+h/pl 34(3.:,3.:)
+h/pl 35(3.:,3.:)
+h/pl 36(3.:,3.:)
+h/pl 37(3.:,3.:)
+h/pl 34
+h/pl 35
+h/pl 36
+h/pl 37
+h/pl 36
+h/pl 50010
+h/pl 50011
+h/pl 50012
+h/pl 50012 colz
+h/pl 1000
+h/del *
+h/pl 1000
+h/pl 1001
+h/pl 1002
+h/li
+close 43
+h/file 43 hb/0043_0201.hb
+h/pl 1000
+h/pl 1001
+h/pl 1002
+h/pl 1003
+h/li
+h/pl 2100
+h/pl 2101
+h/pl 2102
+h/pl 1002
+h/pl 100
+h/pl 34
+h/file 41 hb/0041_0201.hb
+h/pl 1000
+h/pl 50012
+h/pl 50010
+h/pl 50012 colz
+*** End   of history file: Fri Feb  1 15:15:17 2019
