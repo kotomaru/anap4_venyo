@@ -1,0 +1,125 @@
+
+  double re_ex12c[2]={};
+  double re_vec12c[2][4]={};
+  double re_vec[2][3][4]={};
+  double re_rvec[3]={};
+  
+  double re_phe;
+  
+  int re_ichx;
+  int re_ichy;
+  double re_ene0;
+  double re_ene1;
+  
+  if((p[0]==0)&&(p[1]==0)){/* wether both mod's front_cnt=back_cnt */
+    if(tdc_nn[0][0]==tdc_nn[1][0]){ /* wether mod_0_cnt==mod_1_cnt */
+      p2=tdc_nn[0][0];/* p = both mod's cnt */
+      HF2(35,FLUG[0],FLUG[1],1.0);
+      if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	HF2(36,FLUG[0],FLUG[1],1.0);
+	switch (p2){
+	  /* case 1: // hitted 1 particles */
+	  /*   for(i=0;i<N_ADC_MOD;i++){ */
+	  /*     for(j=0;j<p2;j++){ */
+	  /* 	HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
+	  /*     } */
+	  /*   } */
+	  /*   break; */
+	  /* case 2: // hitted 2 particles */
+	  /*   for(i=0;i<N_ADC_MOD;i++){ */
+	  /*     for(j=0;j<p2;j++){ */
+	  /* 	HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
+	  /*     } */
+	  /*   } */
+	  /*   break; */
+	case 3: // hitted 3 particles
+	  //printf("test0");
+	  HF2(37,FLUG[0],FLUG[1],1.0);
+	  //printf("test4");
+	  //3 particle order with tdcc
+	  for(i=0;i<N_ADC_MOD;i++){
+	    for(k=0;k<2;k++){//x & y
+	      for(j=0;j<p2;j++){
+		hitch_tdc_odr[i][j][k]=hit_ch[i][j][k];
+	      }
+	      for(j=0;j<p2;j++){
+		for(jj=j+1;jj<p2;jj++){
+		  int nj,njj;
+		  nj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0];
+		  njj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][jj][k]][0];
+		  if(nj>njj){
+		    //	    printf("%d %d,",j,jj);
+		    itmp=hitch_tdc_odr[i][j][k];
+		    hitch_tdc_odr[i][j][k]=hitch_tdc_odr[i][jj][k];
+		    hitch_tdc_odr[i][jj][k]=itmp;
+		  }
+		}
+		//	printf("%d.%f,",i*N_ADC+k*16+hitch_tdc_odr[i][j][k],tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]);
+		
+	      }
+
+	      //hist of tdc difference between 3 alphas
+	      for(j=1;j<p2;j++){
+		HF1(3000+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
+	      }
+	    }
+	  }
+	  
+	  //all alpha check
+	  // FILE *outfile;
+	  // outfile = fopen("dat/6alpha.dat","a");
+	  //if(outfile == NULL){
+	  // printf("cannot open output file\n");
+	  // exit(1);
+	  //}
+	  for(i=0;i<N_TDC1;i++){
+	    if(tdc_al[i][0]!=0.){
+	      HF1(45,tdcc_al[i][0],1.0);
+	      HF2(46,adcc_al[(int)i/32][(int)i%32],tdc_al[i][0]-tzero,1.0);
+	      if((i<=15)||(i>=32&&i<=47)){
+		HF1(47,tdcc_al[i][0],1.0);
+	      }
+	      //  fprintf(outfile,"%d,%d,%f,",
+	      //      i,tdc_al[i][0]-tzero,adcc_al[(int)i/32][(int)i%32]);
+	    }
+	  }
+	  // fprintf(outfile,"\n");
+	  // fclose(outfile);
+	  
+	  for(i=0;i<N_ADC_MOD;i++){
+	    for(j=0;j<p2;j++){
+	      re_ichx=hit_ch[i][j][0];
+	      re_ichy=hit_ch[i][j][1];
+	      re_ene0=hit_adc[i][j][0];
+	      re_ene1=hit_adc[i][j][1];
+	      
+	      HF2(10010+p2,20*(1-i)+re_ichx,re_ichy,1.0);
+	      
+	      re_vec[i][j][0]=re_ene0+mhe;
+	      
+	      re_rvec[0]=((double)re_ichx-7.5)*3.0;
+	      re_rvec[1]=(7.5-(double)re_ichy)*3.0;
+	      re_rvec[2]=l;
+	      
+	      unitvec(re_rvec,re_rvec);
+	      rotvec(re_rvec,&re_vec[i][j][1],1,pow(-1,i)*theta);
+	      
+	      re_phe=sqrt(re_vec[i][j][0]*re_vec[i][j][0]-mhe*mhe);
+	      vecadd(&re_vec[i][j][1],re_rvec,&re_vec[i][j][1],re_phe,0.0);
+	      vecadd4(re_vec[i][j],re_vec12c[i],re_vec12c[i],1,1);
+	    }
+	    re_ex12c[i]=sqrt(scapro4(re_vec12c[i],re_vec12c[i]))-m12c;
+	    //	  printf("ex:%8.3f\n",ex12c[i]);
+	    HF1(50010+i,re_ex12c[i],1.0);
+	  }
+	  HF2(50012,re_ex12c[0],re_ex12c[1],1.0);
+	  break;
+	  
+	  
+	default:
+	  break;
+	}
+      }
+    }
+  }
+  
