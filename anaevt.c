@@ -18,25 +18,28 @@ const long int TIME_L = -600;//min:-600
 
 int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   int i,ip,j,ii,jj,k,num,n;
-  double tmp;
+  double tmp,tmp2;
+  int itmp;
   int segsize,ids,ips,ipsn,count;
   //  unsigned short qdc[N_QDC];
-  int tdc[N_TDC][N_DUP]={};
-  int tdc_al[N_TDC][N_DUP]={};
-  unsigned int adc[N_ADC_MOD][N_ADC]={};
-  unsigned int adc_al[N_ADC_MOD][N_ADC]={};
+  int tdc[N_TDC][N_DUP]={{0}};
+  int tdc_al[N_TDC][N_DUP]={{0}};
+  unsigned int adc[N_ADC_MOD][N_ADC]={{0}};
+  unsigned int adc_al[N_ADC_MOD][N_ADC]={{0}};
   //  double qdcc[N_QDC];
-  double tdcc[N_TDC][N_DUP]={};
-  double tdcc_al[N_TDC][N_DUP]={};
-  double adcc[N_ADC_MOD][N_ADC]={};
-  double adcc_al[N_ADC_MOD][N_ADC]={};
-  double adc2[N_ADC_MOD][2][16]={};
-  double adccNo1[N_ADC_MOD]={-1000.,-1000.};
-  const double tpar[N_TDC][2]={{0.0, 0.1}};
+  double tdcc[N_TDC][N_DUP]={{0}};
+  double tdcc_al[N_TDC][N_DUP]={{0}};
+  double adcc[N_ADC_MOD][N_ADC]={{0}};
+  double adcc_al[N_ADC_MOD][N_ADC]={{0}};
+  double adc2[N_ADC_MOD][2][16]={{{0}}};
+  //  double adccNo1[N_ADC_MOD]={-1000.,-1000.};
+  //  const double tpar[N_TDC][2]={{0.0, 0.1}};
+  double tpar[N_TDC][2];
   int tdc_cnt[N_TDC]={};
   int tdc_cnt_al[N_TDC]={};
   short tdc_nn[2][2]={};
-
+  int hitch_tdc_odr[N_ADC_MOD][5][2]={{{0}}}; //3 hit tdc in order [2]=omote ura
+  
   short tmpbuf[200];
   /* variables for v1190 */
   int ilt; /* Leading or Trailing */
@@ -51,6 +54,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   //f(x)=dsl*x+dseg x:ADC
   double vsl,vseg; // buffer vsl:slope from ADC to pulse, vseg:segment from ADC to pulse
   double vped,vAm,vpedsig,vAmsig;//buffer for Am dat
+  double buff;//buffer for tdc calib file
   double EAm = 5.48;
   int ir,il;
   int ichc[N_ADC_MOD][N_DUP];//ch array for calib [right or left][0~31 (ch)]
@@ -230,38 +234,15 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 
 
   /**** Data Analysis Here ***************/
-
-  /* v1190 data rearrangement & timing cut */
-  for(i=0;i<N_TDC;i++){
-    tdc_cnt[i]=0;
-  }
-  for(i=0;i<ihit;i++){
-    //    t_measure=raw_v1190[1][i]-tzero; 
-    t_measure=raw_v1190[1][i]; 
-    if(t_measure<(TIME_H+tzero) && t_measure>(TIME_L+tzero)){
-      j=raw_v1190[0][i];
-      if(tdc_cnt[j]<N_DUP){
-	tdc[j][tdc_cnt[j]++]=t_measure;
-      }
-    }
-  }
-	
-
-  /* time calibration */
-  for(i=0;i<N_TDC;i++) {
-    for(j=0;j<N_DUP;j++){
-      //      tdcc[i][j]=(tdc[i][j]-tpar[i][0])*tpar[i][1];
-      tdcc[i][j]=(tdc[i][j]-tpar[0][0])*tpar[0][1];
-    }
-  }
-  
-
+ 
   /* ADC calibration */
 
   FILE *fright,*fleft;
+  //calibration after beam time
   fright = fopen("../calib/Am_result00.txt","r");
   fleft = fopen("../calib/Am_result01.txt","r");
-  // fright = fopen("../calib/ADC_calib_mod00_ver1.dat","r");
+  //calibration before beam time
+  //fright = fopen("../calib/ADC_calib_mod00_ver1.dat","r");
   //fleft = fopen("../calib/ADC_calib_mod01_ver1.dat","r");
   if(fright==NULL){
     puts("calib0 file cannot open");
@@ -281,64 +262,80 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   fclose(fright);
   fclose(fleft);
 
-  //calibration by data after beam time using pulse fitting
-  //I cant think segment of Am  
-  /*  FILE *fright,*fleft; */
-  /*  FILE *frightAm,*fleftAm; */
-  /* fright = fopen("../calib/after_result00.txt","r"); */
-  /* fleft = fopen("../calib/after_result01.txt","r"); */
-  /* frightAm = fopen("../calib/Am_calb00.txt","r"); */
-  /* fleftAm = fopen("../calib/Am_calb01.txt","r"); */
-  /* if(fright==NULL){ */
-  /*   puts("calib0 file cannot open"); */
-  /*   return -1; */
-  /* } */
-  /* if(fleft==NULL){ */
-  /*   puts("calib1 file cannot open"); */
-  /*   return -1; */
-  /* } */
-  /*  if(frightAm==NULL){ */
-  /*   puts("Amcalib0 file cannot open"); */
-  /*   return -1; */
-  /* } */
-  /* if(fleftAm==NULL){ */
-  /*   puts("Amcalib1 file cannot open"); */
-  /*   return -1; */
-  /* } */
+ 
+  /*****adc gate here****/
+  float adccmin=0.7;//ADC Gate to eliminate crosstalk
+  float adccmax=10.;
 
-  /* //input calib data from txt file */
-  /* while(fscanf(fright,"%d %lf %lf",&vch,&vsl,&vseg)!=EOF){ */
-  /*   ichc[0][vch]=vch;dsl[0][vch]=vsl;dseg[0][vch]=vseg; */
-  /* } */
-  /* while(fscanf(fleft,"%d %lf %lf",&vch,&vsl,&vseg)!=EOF){ */
-  /*   ichc[1][vch]=vch;dsl[1][vch]=vsl;dseg[1][vch]=vseg; */
-  /* } */
-  /* vch_am=0; */
-  /* while(fscanf(frightAm,"%lf %lf %lf %lf",&vped,&vpedsig,&vAm,&vAmsig)!=EOF){ */
-  /*   dped[0][vch_am]=vped;dAm[0][vch_am]=vAm; */
-  /*   vch_am++; */
-  /* } */
-  /* vch_am=0; */
-  /*  while(fscanf(fleftAm,"%lf %lf %lf %lf",&vped,&vpedsig,&vAm,&vAmsig)!=EOF){ */
-  /*   dped[1][vch_am]=vped;dAm[1][vch_am]=vAm; */
-  /*   vch_am++; */
-  /* } */
+  for(i=0;i<N_ADC_MOD;i++){
+    for(j=0;j<N_ADC;j++){
+      if(adcc[i][j]<adccmin || adcc[i][j]>adccmax){
+	adcc[i][j]=0.;
+      }
+    }
+  }
+
+ /* v1190 data rearrangement & timing cut */
+  /***if adc isnt within gate, dont analyze*****/
+
+  for(i=0;i<N_TDC;i++){
+    tdc_cnt[i]=0;
+  }
+  for(i=0;i<ihit;i++){
+    //    t_measure=raw_v1190[1][i]-tzero; 
+    t_measure=raw_v1190[1][i]; 
+    if(t_measure<(TIME_H+tzero) && t_measure>(TIME_L+tzero)){
+      j=raw_v1190[0][i];
+      if(tdc_cnt[j]<N_DUP){
+	if(j<=N_TDC1){
+	  if(adcc[(int)j/32][(int)j%32]!=0.){
+	    tdc[j][tdc_cnt[j]++]=t_measure;
+	  }
+	  else{
+	    tdc[j][tdc_cnt[j]]=0.;
+	  }
+      	}
+      	else{
+	  tdc[j][tdc_cnt[j]++]=t_measure;
+      	}
+      }
+    }
+  }
+	
+
+  /* time calibration */
+  for(i=0;i<N_TDC;i++){
+    tpar[i][0]=0.;
+    tpar[i][1]=0.1; //from channel to ns
+  }
+  FILE *ftdc;
+  ftdc = fopen("../calib/tdc_am.txt","r");
+  if(ftdc==NULL){
+    puts("tdc calib file cannot open");
+    return -1;
+  }
   
-  /* fclose(fright); */
-  /* fclose(fleft); */
-  /* fclose(frightAm); */
-  /* fclose(fleftAm); */
-  /* //ADC calib start */
-  /* //adcc=f(adc)/f(adc of 5.48MeV)*5.48 */
-  /* for(j=0;j<N_ADC_MOD;j++){ */
-  /*   for(i=0;i<N_ADC;i++){ */
-  /*     adcc[j][i]=((double)adc[j][i]*dsl[j][i]+dseg[j][i])\ */
-  /* 	           /(dAm[j][i]*dsl[j][i]+dseg[j][i])\ */
-  /* 	          *EAm; */
+  i=0;
+  while(fscanf(ftdc,"%lf %lf",&tpar[i][0],&buff)!=EOF){
+    if(i>=N_TDC1){break;}
+    for(j=0;j<N_DUP;j++){
+      tdcc[i][j] = (tdc[i][j]-tpar[i][0]+3000-tzero)*tpar[i][1];
+    }
+    // printf("%f %f\n",tpar[i][0],buff);
+    i++;
+  }
+  fclose(ftdc);
+  
+  
+  /* for(i=0;i<N_TDC;i++) { */
+  /*   for(j=0;j<N_DUP;j++){ */
+  /*     //      tdcc[i][j]=(tdc[i][j]-tpar[i][0])*tpar[i][1]; */
+  /*     tdcc[i][j]=(tdc[i][j]-tpar[0][0])*tpar[i][1]; */
   /*   } */
   /* } */
-
-  /**** adc channel align here ****/
+  
+  
+  /**** adc &tdc channel align here ****/
   for(j=0;j<N_ADC_MOD;j++){
     for(i=0;i<16;i++){
       adc_al[j][i] = adc[j][i];
@@ -371,16 +368,30 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   /**** adc channel align above ****/
 
   /***No.1 adc search here***/
-  for(i=0;i<N_ADC_MOD;i++){
-    for(j=0;j<N_ADC;j++){
-      if(adcc_al[i][j]>adccNo1[i]){
-	adccNo1[i]=adcc_al[i][j];
+  /* for(i=0;i<N_ADC_MOD;i++){ */
+  /*   for(j=0;j<N_ADC;j++){ */
+  /*     if(adcc_al[i][j]>adccNo1[i]){ */
+  /* 	adccNo1[i]=adcc_al[i][j]; */
+  /*     } */
+  /*   } */
+  /* } */
+  /***No.1 adc search above***/
+
+  //alligned & ascending order tdc 
+  for(i=0;i<N_TDC1;i++){
+    for(j=0;j<tdc_cnt_al[i];j++){
+      for(k=j+1;k<tdc_cnt_al[i];k++){
+	if(tdcc_al[i][j]>tdcc_al[i][k]){
+	  tmp=tdc_al[i][j];
+	  tdc_al[i][j]=tdc_al[i][k];
+	  tdc_al[i][k]=tmp;
+	  tmp2=tdcc_al[i][j];
+	  tdcc_al[i][j]=tdcc_al[i][k];
+	  tdcc_al[i][k]=tmp2;
+	}
       }
     }
   }
-  
-  /***No.1 adc search here***/
-
 
 
 //  divide adc into x and y axis
@@ -389,12 +400,12 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
       adc2[i][(int)j/16][j%16]=adcc_al[i][j];
     }
   }
-//  divide tdc hits into [2][2]
+  //  divide tdc hits into [2][2]
   for(i=0;i<N_TDC1;i++){
     tdc_nn[(int)i/32][(i/16)%2]+=tdc_cnt[i];
   }
-
-//  make vector of Si pixels
+  
+  //  make vector of Si pixels
   short adc_ch[2][16]; // temporary adc channels
   short pixx[N_ADC_MOD][N_ADC/2]; // temporary coordinates
   short pixy[N_ADC_MOD][N_ADC/2];
@@ -404,7 +415,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   unsigned short pp[2]={};
   unsigned short hit_ch[N_ADC_MOD][16][2]; // coordinates against pn
   double hit_adc[N_ADC_MOD][16][2];
-
+  
   for(i=0;i<2;i++){
     for(j=0;j<16;j++){
       adc_ch[i][j]=-1;
@@ -418,9 +429,9 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
       }
     }
   }
-
+  
   unsigned short p[2]={};
-
+  
   for(i=0;i<N_ADC_MOD;i++){ // loop modele 0,1
     pn=0;
     for(k=0;k<2;k++){
@@ -428,7 +439,8 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	adc_ch[k][j]=j;
       }
     }
-    p[i]=(tdc_nn[i][0]>tdc_nn[i][1]) ? tdc_nn[i][0]-tdc_nn[i][1]:tdc_nn[i][1]-tdc_nn[i][0];    
+    //    p[i]=(tdc_nn[i][0]>tdc_nn[i][1]) ? tdc_nn[i][0]-tdc_nn[i][1]:tdc_nn[i][1]-tdc_nn[i][0];
+    p[i] = abs(tdc_nn[i][0]-tdc_nn[i][1]);
     switch(p[i]){
     case 0: // same counts
       for(j=0;j<N_ADC;j++){
@@ -507,25 +519,58 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   double vec12c[2][4]={};
   double vec[2][3][4]={};
   double rvec[3]={};
-
+  
   const double m12c=931.5*12;
   const double mhe=931.5*4+2.4;;
   double phe;
-
+  
   int ichx;
   int ichy;
   double ene0;
   double ene1;
-
+  
   /* const double theta=24./180*M_PI; */ 
   const double theta=35./180*M_PI;
   const double l = 77.5;	/* correct Si mount  */
   // const double l = 112.5;	/* mistaken Si mount */
+
+  //making tdc Gate flug here 
+  int gtmin=200.;
+  int gtmax=500.;
   
-  if((p[0]==0)&&(p[1]==0)){	/* wether both mod's front_cnt=back_cnt */
-    if(tdc_nn[0][0]==tdc_nn[1][0]){ /* wether mod_0_cnt==mod_1_cnt */
-      // int ichx,ichy;
-      p2=tdc_nn[0][0];		    /* p = both mod's cnt */
+  int flug[N_ADC_MOD][N_ADC]={};//(if within ADC GATE) = 1
+  int FLUG[N_ADC_MOD]={};//SUM of flug
+  int HFflug_tdcGate[N_TDC1]={};
+  
+  for(i=0;i<N_TDC1;i++){//TDC ch = 0~63
+    HF2(33,i,tdc_cnt_al[i]*2,1.0);
+    if(tdc_al[i][0]!=0 && sicnt[i/32]>0
+       && (tdcc_al[i][0])>gtmin && (tdcc_al[i][0])<gtmax){
+      if(adcc_al[(int)i/32][(int)i%32] > adccmin
+	 && adcc_al[(int)i/32][(int)i%32] <adccmax){
+	HFflug_tdcGate[i]=1;
+	flug[(int)i/32][(int)i%32]=1;
+	HF2(38,tdcc_al[i][0],i,1.0);
+      }
+    }
+  }
+  for(i=0;i<N_ADC_MOD;i++){
+    for(j=0;j<N_ADC/2;j++){
+      FLUG[i]=FLUG[i]+flug[i][j];
+    }
+  }
+  HF2(34,FLUG[0],FLUG[1],1.0);
+    //making tdc Gate flug above
+  
+  if((p[0]==0)&&(p[1]==0)){/* wether both mod's front_cnt=back_cnt */
+    if(tdc_nn[0][0]==tdc_nn[1][0]){/* wether mod_0_cnt==mod_1_cnt */
+      //int ichx,ichy;
+      p2=tdc_nn[0][0]; /* p = both mod's cnt */
+      //      printf("%u,",p2);
+      HF2(35,FLUG[0],FLUG[1],1.0);
+      if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	HF2(36,FLUG[0],FLUG[1],1.0);
+      }
       switch (p2){
       case 1: // hitted 1 particles
   	for(i=0;i<N_ADC_MOD;i++){
@@ -542,24 +587,64 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	}
 	break;
       case 3: // hitted 3 particles
+	if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	  HF2(37,FLUG[0],FLUG[1],1.0);
+	}
+
+	//3 particle order with tdcc
+	for(i=0;i<N_ADC_MOD;i++){
+	  for(k=0;k<2;k++){//x & y
+	    for(j=0;j<p2;j++){
+	      hitch_tdc_odr[i][j][k]=hit_ch[i][j][k];
+	    }
+	    for(j=0;j<p2;j++){
+	      for(jj=j+1;jj<p2;jj++){
+		int nj,njj;
+		nj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0];
+		njj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][jj][k]][0];
+		if(nj>njj){
+		  //	    printf("%d %d,",j,jj);
+		  itmp=hitch_tdc_odr[i][j][k];
+		  hitch_tdc_odr[i][j][k]=hitch_tdc_odr[i][jj][k];
+		  hitch_tdc_odr[i][jj][k]=itmp;
+		}
+	      }
+	      //	printf("%d.%f,",i*N_ADC+k*16+hitch_tdc_odr[i][j][k],tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]);
+	      
+	    }
+	    
+	    //hist of tdc difference between 3 alphas
+	    for(j=1;j<p2;j++){
+	      HF1(3000+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
+	      if(FLUG[0]>=p2 && FLUG[1]>=p2){
+		HF1(3010+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
+	      }
+	    }
+	  }
+	}
+	
   	for(i=0;i<N_ADC_MOD;i++){
+	  //  printf("test8");
 	  for(j=0;j<p2;j++){
 	    ichx=hit_ch[i][j][0];
 	    ichy=hit_ch[i][j][1];
 	    ene0=hit_adc[i][j][0];
 	    ene1=hit_adc[i][j][1];
-
+	    
 	    HF2(10000+p2,20*(1-i)+ichx,ichy,1.0);
+	    if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	      //  HF2(10010+p2,20*(1-i)+ichx,ichy,1.0);
+	    }
 	    
 	    vec[i][j][0]=ene0+mhe;
-
+	    
 	    rvec[0]=((double)ichx-7.5)*3.0;
 	    rvec[1]=(7.5-(double)ichy)*3.0;
 	    rvec[2]=l;
-
+	    
 	    unitvec(rvec,rvec);
 	    rotvec(rvec,&vec[i][j][1],1,pow(-1,i)*theta);
-
+	    
 	    phe=sqrt(vec[i][j][0]*vec[i][j][0]-mhe*mhe);
 	    vecadd(&vec[i][j][1],rvec,&vec[i][j][1],phe,0.0);
 	    vecadd4(vec[i][j],vec12c[i],vec12c[i],1,1);
@@ -570,25 +655,51 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	  ex12c[i]=sqrt(scapro4(vec12c[i],vec12c[i]))-m12c;
 	  //	  printf("ex:%8.3f\n",ex12c[i]);
 	  HF1(50000+i,ex12c[i],1.0);
+	  if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	    HF1(50010+i,ex12c[i],1.0);
+	  }
 	}
 	HF2(50002,ex12c[0],ex12c[1],1.0);
-	break;
+	if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	  HF2(50012,ex12c[0],ex12c[1],1.0);
 
+	  //all alpha check
+	  // FILE *outfile;
+	  // outfile = fopen("dat/6alpha.dat","a");
+	  //if(outfile == NULL){
+	  // printf("cannot open output file\n");
+	  // exit(1);
+	  //}
+	  for(i=0;i<N_TDC1;i++){
+	    if(tdc_al[i][0]!=0.){
+	      HF1(45,tdcc_al[i][0],1.0);
+	      HF2(46,adcc_al[(int)i/32][(int)i%32],tdc_al[i][0]-tzero,1.0);
+	      if((i<=15)||(i>=32&&i<=47)){
+		HF1(47,tdcc_al[i][0],1.0);
+	      }
+	      //  fprintf(outfile,"%d,%d,%f,",
+	      //      i,tdc_al[i][0]-tzero,adcc_al[(int)i/32][(int)i%32]);
+	    }
+	  }
+	  // fprintf(outfile,"\n");
+	  // fclose(outfile);
+	}
+	
+	break;
+	
       default:
 	break;
       }
     }
   }
-
-
   /**** Data Analysis Above ***************/
   
   /*********** Booking here **********/
-
+  
   /*
-  for(i=0;i<N_QDC;i++){
+    for(i=0;i<N_QDC;i++){
     HF1(10+i,qdc[i],1.0);
-  }
+    }
  */
 
 //  ***** memo *****
@@ -602,8 +713,22 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 //  adcc_al[right or left][ch]: calibrated and aligned adc
 //  tdc[ch][event_num]: tdc
 //  tdcc[ch][event_num]: calibrated tdc
-//  tdc_cnt[]: hit count of each tdc channel
+//  tdc_cnt[]: hit count of each tdc hannel
 
+  for(i=0;i<N_TDC1;i++){
+    for(j=0;j<tdc_cnt_al[i];j++){
+      if(tdc_al[i][j]!=0 && sicnt[i/32]>0){
+	HF2(30,i,tdc_al[i][j]-tzero,1.0);
+	HF1(31,i,1.0);
+	HF1(1000+i,tdc_al[i][j]-tzero,1.0);
+	HF1(2000+i,tdcc_al[i][j],1.0);
+	// HF2(2000+i,tdc_al[i][j]-tzero,adcc_al[(int)i/16][(int)i%16],1.0);
+      }
+    }
+  }
+  
+  
+  
   for(j=0;j<2;j++){
     for(i=0;i<N_ADC_MOD;i++){
       sicnt[i]=0;
@@ -615,15 +740,15 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
       HF1(20000+2*i+j,sicnt[i],1.0);
     }
     if(j==0){
-    HF1(20004,sicnt[0]+sicnt[1],1.0);
+      HF1(20004,sicnt[0]+sicnt[1],1.0);
     }
   }
   HF1(20005,sicnt[0]+sicnt[1],1.0);
-
-//  check Si strip
+  
+  //  check Si strip
   for(j=0;j<N_ADC_MOD;j++){
     for(i=0;i<N_ADC;i++){
-//      if(tdc[N_ADC*j+i][0]-tzero>0){
+      //      if(tdc[N_ADC*j+i][0]-tzero>0){
       if(tdc_cnt[j*N_ADC+i]>0.){
 	if(sicnt[j]>0){
 	  HF2(10+j,i,adc[j][i],1.0);
@@ -632,7 +757,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	//	HF1(20+N_ADC_MOD+j,i,1.0);
       }
       if(tdc_cnt_al[j*N_ADC+i]>0.){
-	  HF2(20+j,i,adcc_al[j][i],1.0);
+	HF2(20+j,i,adcc_al[j][i],1.0);
       }
       // HF1(500+N_ADC*j+i,adc[j][i],1.0);
       if(sicnt[0]+sicnt[1]==1) {
@@ -640,154 +765,26 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	//	HF1(1000+j,i,1.0);
 	HF1(170+j,adcc[j][i],1.0);
       }
-	// }
+      // }
       if(tdc_cnt_al[j*N_ADC+i]>0.){
 	//		HF1(600+N_ADC*j+i,adc_al[j][i],1.0);
-		HF1(800+N_ADC*j+i,adcc_al[j][i],1.0);
-		HF1(170+j+N_ADC_MOD,adcc_al[j][i],1.0);
+	HF1(800+N_ADC*j+i,adcc_al[j][i],1.0);
+	HF1(170+j+N_ADC_MOD,adcc_al[j][i],1.0);
       }
     }
   }
-
-   //alligned & ascending order tdc 
-  double tmp2;
+  
+  /**TDC gate & 1st TDC with in one strip**/
   for(i=0;i<N_TDC1;i++){
-    for(j=0;j<tdc_cnt_al[i];j++){
-      for(k=j+1;k<tdc_cnt_al[i];k++){
-	if(tdc_al[i][j]>tdc_al[i][k]){
-	  tmp2=tdc_al[i][j];
-	  tdc_al[i][j]=tdc_al[i][k];
-	  tdc_al[i][k]=tmp2;
-	}
-      }
+    if(HFflug_tdcGate[i]){
+      HF2(40,i,tdc_al[i][0]-tzero,1.0);
+      HF1(41,i,1.0);
+      HF1(1100+i,tdc_al[i][0]-tzero,1.0);
+      HF1(900+i,adcc_al[(int)i/32][(int)i%32],1.0);
+      HF2(2100+i,tdc_al[i][0]-tzero,adcc_al[(int)i/32][(int)i%32],1.0);
     }
   }
 
-  for(i=0;i<N_TDC1;i++){
-    for(j=0;j<tdc_cnt_al[i];j++){
-      if(tdc_al[i][j]!=0 && sicnt[i/32]>0){
-	HF2(30,i,tdc_al[i][j]-tzero,1.0);
-	HF1(31,i,1.0);
-	HF1(1000+i,tdc_al[i][j]-tzero,1.0);
-	//	HF2(2000+i,tdc_al[i][j]-tzero,adcc_al[(int)i/16][(int)i%16],1.0);
-      }
-    }
-  }
-  
-  //TDC Gate 2500~5000 & the first TDC only 20190130 shiyo modified
-   
-  float gtmin=2500.;//TDC Gate
-  float gtmax=5000.;
-  float adccmin=0.2;//ADC Gate to eliminate crosstalk
-  float adccmax=10.;
-  int flug[N_ADC_MOD][N_ADC]={};//(if within ADC GATE) = 1
-  int FLUG[N_ADC_MOD]={};//SUM of flug
-  
-  for(i=0;i<N_TDC1;i++){//TDC ch = 0~63
-    HF2(33,i,tdc_cnt_al[i]*2,1.0);
-    if(tdc_al[i][0]!=0 && sicnt[i/32]>0
-       && (tdc_al[i][0]-tzero)>gtmin && (tdc_al[i][0]-tzero)<gtmax)
-  	{
-  	  HF2(40,i,tdc_al[i][0]-tzero,1.0);
-  	  HF1(41,i,1.0);
-	  HF1(1100+i,tdc_al[i][0]-tzero,1.0);
-	  HF1(900+i,adcc_al[(int)i/32][(int)i%16],1.0);
-
-	  /***except closs talk ***/
-	  if(adcc_al[(int)i/32][(int)i%16] != adccNo1[(int)i/32]){
-	    HF1(400+i,adcc_al[(int)i/32][(int)i%16],1.0);
-	}
-	  if(adcc_al[(int)i/32][(int)i%16]>adccmin
-	     && adcc_al[(int)i/32][(int)i%16]<adccmax){
-	    HF2(2100+i,tdc_al[i][0]-tzero,adcc_al[(int)i/32][(int)i%16],1.0);
-	    flug[(int)i/32][(int)i%16]=1;
-	  }
-	}
-  }
-  for(i=0;i<N_ADC_MOD;i++){
-    for(j=0;j<N_ADC/2;j++){
-      FLUG[i]=FLUG[i]+flug[i][j];
-    }
-  }
-  HF2(34,FLUG[0],FLUG[1],1.0);
-
-  double re_ex12c[2]={};
-  double re_vec12c[2][4]={};
-  double re_vec[2][3][4]={};
-  double re_rvec[3]={};
-
-  double re_phe;
-
-  int re_ichx;
-  int re_ichy;
-  double re_ene0;
-  double re_ene1;
-
-  
-  if((p[0]==0)&&(p[1]==0)){	/* wether both mod's front_cnt=back_cnt */
-    if(tdc_nn[0][0]==tdc_nn[1][0]){ /* wether mod_0_cnt==mod_1_cnt */
-      p2=tdc_nn[0][0];/* p = both mod's cnt */
-       HF2(35,FLUG[0],FLUG[1],1.0);
-      if(FLUG[0]>=p2 && FLUG[1]>=p2){
-	 HF2(36,FLUG[0],FLUG[1],1.0);
-	switch (p2){
-	  /* case 1: // hitted 1 particles */
-	  /*   for(i=0;i<N_ADC_MOD;i++){ */
-	  /*     for(j=0;j<p2;j++){ */
-	  /* 	HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
-	  /*     } */
-	  /*   } */
-	  /*   break; */
-	  /* case 2: // hitted 2 particles */
-	  /*   for(i=0;i<N_ADC_MOD;i++){ */
-	  /*     for(j=0;j<p2;j++){ */
-	  /* 	HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
-	  /*     } */
-	  /*   } */
-	  /*   break; */
-	case 3: // hitted 3 particles
-	  HF2(37,FLUG[0],FLUG[1],1.0);
-	  for(i=0;i<N_ADC_MOD;i++){
-	    for(j=0;j<p2;j++){
-	      re_ichx=hit_ch[i][j][0];
-	      re_ichy=hit_ch[i][j][1];
-	      re_ene0=hit_adc[i][j][0];
-	      re_ene1=hit_adc[i][j][1];
-	      
-	      HF2(10010+p2,20*(1-i)+re_ichx,re_ichy,1.0);
-	      
-	      re_vec[i][j][0]=re_ene0+mhe;
-	      
-	      re_rvec[0]=((double)re_ichx-7.5)*3.0;
-	      re_rvec[1]=(7.5-(double)re_ichy)*3.0;
-	      re_rvec[2]=l;
-	      
-	      unitvec(re_rvec,re_rvec);
-	      rotvec(re_rvec,&re_vec[i][j][1],1,pow(-1,i)*theta);
-	      
-	      re_phe=sqrt(re_vec[i][j][0]*re_vec[i][j][0]-mhe*mhe);
-	      vecadd(&re_vec[i][j][1],re_rvec,&re_vec[i][j][1],re_phe,0.0);
-	      vecadd4(re_vec[i][j],re_vec12c[i],re_vec12c[i],1,1);
-	      //	    printf("%d:%d  p:%8.3f ene:%8.3f\n",i,j,phe,ene0);
-	      //printf("%d:%d: %8.3f   \n",i,j,
-	      //	   sqrt(scapro4(vec[i][j],vec[i][j])));
-	    }
-	    re_ex12c[i]=sqrt(scapro4(re_vec12c[i],re_vec12c[i]))-m12c;
-	    //	  printf("ex:%8.3f\n",ex12c[i]);
-	    HF1(50010+i,re_ex12c[i],1.0);
-	    
-	  }
-	  HF2(50012,re_ex12c[0],re_ex12c[1],1.0);
-	  break;
-	  
-	default:
-	  break;
-	}
-      }
-    }
-  }
-  
-  
   /*********** Booking Above **********/
   return(ip);
 }

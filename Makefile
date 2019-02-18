@@ -1,4 +1,4 @@
-CC = gcc -g -Df2cFortran
+CC = gcc -g -Df2cFortran -Wno-unused-variable -Wno-unused-but-set-variable
 # all: anap4.c lorlib.o kinelib.o startup.o dataclient.o histdef.o anaevt.o anap4.h
 # 	$(CC) -o anap4 anap4.c lorlib.o kinelib.o startup.o dataclient.o \
 #                 histdef.o anaevt.o -lm -Wl,-Bstatic -lmathlib -lpacklib -lkernlib -Wl,-Bdynamic -lpthread -lncurses -lnsl -lgfortran

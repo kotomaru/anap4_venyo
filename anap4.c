@@ -1,4 +1,3 @@
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +49,15 @@ int main(int iarg, char *argv[]){
 
   //  signal(SIGINT,(void *)
 
+  /**clear file**/
+  /* FILE *outfile; */
+  /* outfile = fopen("dat/6alpha.dat","w"); */
+  /* if(outfile == NULL){ */
+  /*   printf("cannot open output file\n"); */
+  /*   exit(1); */
+  /* } */
+  /* fclose(outfile); */
+  
   /***** Read arguments ****************/
   dat.nrun=startup(iarg,argv,&dat.flag,dat.runv,outpath);
   if(dat.nrun==-1) {

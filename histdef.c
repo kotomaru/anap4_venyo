@@ -28,8 +28,8 @@ int histdef(){
       HBOOK1(800+N_ADC*j+i,hnam,2048,-10.,64.,0);
       sprintf(hnam,"calib-ADC %s ch:%02d with TDC Gate",mod[j],i);
       HBOOK1(900+N_ADC*j+i,hnam,2048,-10.,64.,0);
-      sprintf(hnam,"calib-ADC %s ch:%02d case not adcNo1",mod[j],i);
-      HBOOK1(400+N_ADC*j+i,hnam,2048,-10.,64.,0);
+      /// sprintf(hnam,"calib-ADC %s ch:%02d case not adcNo1",mod[j],i);
+      //HBOOK1(400+N_ADC*j+i,hnam,2048,-10.,64.,0);
     }
     sprintf(hnam, "ADC ch-monitor %s",mod[j]);
     HBOOK2(10+j,hnam,32,0.,32.,128,0.,4096.,0);
@@ -56,17 +56,30 @@ int histdef(){
   HBOOK1(41,"TDC ch-counter with TDC Gate",128,0.,128.,0);
   sprintf(hnam,"TDC ch vs TDC count");
   HBOOK2(33,hnam,64,0.,64.,10,0.,10.,0);
+  sprintf(hnam,"TDCC vs TDC ch TDC ADC gate");
+  HBOOK2(38,hnam,256,0.,800.,64,0.,64.,0);
+
   for(i=0;i<N_TDC1;i++){
-    sprintf(hnam,"TDC %02d",i);
-    HBOOK1(1000+i,hnam,2048,-6000.,12000.,0);
+    // sprintf(hnam,"TDC %02d",i);
+    //HBOOK1(1000+i,hnam,2048,-6000.,12000.,0);
+    sprintf(hnam,"calib TDC %02d",i);
+    HBOOK1(2000+i,hnam,2048,-600.,1200.,0);
     // sprintf(hnam,"TDC vs ADC",i);
     // HBOOK2(2000+i,hnam,2048,-6000.,12000.,1024,0.,64.,0);
-    sprintf(hnam,"TDC %02d with TDC Gate",i);
+    sprintf(hnam,"TDC %02d with TDC Gate ",i);
     HBOOK1(1100+i,hnam,2048,-6000.,12000.,0);
     sprintf(hnam,"TDC vs ADC %02d with TDC Gate",i);
     HBOOK2(2100+i,hnam,64,-6000.,6000.,64,0.,64.,0);
    
   }
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event 00");
+  HBOOK1(3000,hnam,500,-100.,400.,0);
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event 01");
+  HBOOK1(3001,hnam,500,-100.,400.,0);
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event with Gate  00");
+  HBOOK1(3010,hnam,500,-100.,400.,0);
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event with Gate 01");
+  HBOOK1(3011,hnam,500,-100.,400.,0);
 
 
   // HBOOK1(32,"TDC ch-counter2",128,0.,128.,0);
@@ -82,7 +95,7 @@ int histdef(){
     sprintf(hnam,"hit pattern %1d x %1d",i,i);
     HBOOK2(10000+i,hnam,44,-4.,40.,48.,-16.,32.,0);
   }
-  sprintf(hnam,"hit pattern %1d x %1d except cross tark with TDC Gate",3,3);
+  sprintf(hnam,"hit pattern %1d x %1d except with TDC Gate",3,3);
   HBOOK2(10010+3,hnam,44,-4.,40.,48.,-16.,32.,0);
 
   HBOOK1(20000,"strip 0 front",16,0.,16.,0);
@@ -96,15 +109,16 @@ int histdef(){
   HBOOK2(35,"No. of particle within Gate STRICT1 right vs left",10,0.,10.,10,0.,10.,0);
   HBOOK2(36,"No. of particle within Gate STRICT2 right vs left",10,0.,10.,10,0.,10.,0);
   HBOOK2(37,"No. of particle within Gate STRICT3 right vs left",10,0.,10.,10,0.,10.,0);
-  HBOOK1(50000,"invariant mass of 12C mod 0 ",128,0.,32.,0);
-  HBOOK1(50001,"invariant mass of 12C mod 1 ",128,0.,32.,0);
-  HBOOK2(50002,"invariant mass of 12C 0vs1",128,0.,256.,128,0.,256.,0);
+  HBOOK1(50000,"invariant mass of 12C mod 0 ",128,0.,16.,0);
+  HBOOK1(50001,"invariant mass of 12C mod 1 ",128,0.,16.,0);
+  HBOOK2(50002,"invariant mass of 12C 0vs1",128,0.,16.,128,0.,16.,0);
 
-  HBOOK1(50010,"invariant mass of 12C mod 0 with TDC-Gate except crosstalk ",128,0.,32.,0);
-  HBOOK1(50011,"invariant mass of 12C mod 1 with TDC-Gate except crosstalk ",128,0.,32.,0);
-  HBOOK2(50012,"invariant mass of 12C 0vs1 with TDC-Gate except crosstalk ",128,0.,2560.,128,0.,2560.,0);
-
-
+  HBOOK1(50010,"invariant mass of 12C mod 0 with TDC-Gate ",128,0.,16.,0);
+  HBOOK1(50011,"invariant mass of 12C mod 1 with TDC-Gate ",128,0.,16.,0);
+  HBOOK2(50012,"invariant mass of 12C 0vs1 with TDC-Gate ",128,0.,16.,128,0.,16.,0);
+  HBOOK1(45,"all tdcc with all gate",256,-600.,600.,0);
+  HBOOK2(46,"all adcc vs tdc with all gate",32,0.,10.,128,0.,8000.,0);
+  HBOOK1(47,"all tdcc with all gate only omote",256,-600.,600.,0);
   /*2018/06/08 homework */
   
   return(1);
