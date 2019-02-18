@@ -72,14 +72,19 @@ int histdef(){
     HBOOK2(2100+i,hnam,64,-6000.,6000.,64,0.,64.,0);
    
   }
+ 
   sprintf(hnam,"DIFF of TDCC in 3 alpha event 00");
   HBOOK1(3000,hnam,500,-100.,400.,0);
   sprintf(hnam,"DIFF of TDCC in 3 alpha event 01");
   HBOOK1(3001,hnam,500,-100.,400.,0);
-  sprintf(hnam,"DIFF of TDCC in 3 alpha event with Gate  00");
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event with tdc Gate  00");
   HBOOK1(3010,hnam,500,-100.,400.,0);
-  sprintf(hnam,"DIFF of TDCC in 3 alpha event with Gate 01");
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event with tdc Gate 01");
   HBOOK1(3011,hnam,500,-100.,400.,0);
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event with tdcGate-coincidence 00");
+  HBOOK1(3020,hnam,500,-100.,400.,0);
+  sprintf(hnam,"DIFF of TDCC in 3 alpha event with tdcGate-coincidence 01");
+  HBOOK1(3021,hnam,500,-100.,400.,0);
 
 
   // HBOOK1(32,"TDC ch-counter2",128,0.,128.,0);
@@ -116,6 +121,11 @@ int histdef(){
   HBOOK1(50010,"invariant mass of 12C mod 0 with TDC-Gate ",128,0.,16.,0);
   HBOOK1(50011,"invariant mass of 12C mod 1 with TDC-Gate ",128,0.,16.,0);
   HBOOK2(50012,"invariant mass of 12C 0vs1 with TDC-Gate ",128,0.,16.,128,0.,16.,0);
+  HBOOK1(50020,"invariant mass of 12C mod 0 with TDC-Gate 3alpha coin",128,0.,16.,0);
+  HBOOK1(50021,"invariant mass of 12C mod 1 with TDC-Gate 3alpha coin",128,0.,16.,0);
+  HBOOK1(50030,"invariant mass of 12C mod 0 with TDC-Gate 6alpha coin",128,0.,16.,0);
+  HBOOK1(50031,"invariant mass of 12C mod 1 with TDC-Gate 6alpha coin",128,0.,16.,0);
+
   HBOOK1(45,"all tdcc with all gate",256,-600.,600.,0);
   HBOOK2(46,"all adcc vs tdc with all gate",32,0.,10.,128,0.,8000.,0);
   HBOOK1(47,"all tdcc with all gate only omote",256,-600.,600.,0);

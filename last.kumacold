@@ -1,102 +1,52 @@
-*** Begin of history file: Sun Feb 17 16:42:57 2019
-h/file 37 hb/0037_0217.hb
+*** Begin of history file: Mon Feb 18 18:49:35 2019
+h/file 41 hb/0041.hb
+opt stat
+zone 2 2
+h/pl 50000(6.:10.)
+h/pl 10000(6.:10.)
+h/pl 50010(6.:10.)
+h/pl 50020(6.:10.)
+close 41
+h/file 41 hb/0041_0218.hb
+h/pl 50000(6.:10.)
+h/pl 50000(6.:10.)
+h/pl 50000(6.:10.)
+h/pl 50010(6.:10.)
+h/pl 50020(6.:10.)
+h/pl 50030(6.:10.)
+h/pl 50001(6.:10.)
+h/pl 50011(6.:10.)
+h/pl 50021(6.:10.)
+h/pl 50031(6.:10.)
+h/pl 3000
 h/li
-h/pl 3000
-h/pl 3000
-h/li
-h/pl 3000
-h/li
-h/del *
-h/pl 3001
-h/pl 3000
-opt static
-h/pl 3000
-h/pl 3000
-h/del *
+zone 1 3
 h/pl 3000
 h/pl 3001
-close 37
-h/file 37 hb/0037_0217.hb
-h/pl 3000
-h/pl 3000
-h/pl 3001
-h/pl 3000
-h/del *
-h/pl 3000
-h/pl 3001
-h/pl 1000
-h/li
-h/pl 2000
-h/pl 50012
-h/pl 50010
-h/pl 2000
-h/pl 3001
-h/pl 2000
-h/pl 2000(200.:400.)
-h/pl 3001
-h/pl 3001
-h/del *
-h/pl 3001
-close 37
-h/file 37 hb/0037_0217.hb
-h/pl 3001
-h/pl 2000
-h/pl 2000
-h/pl 3001
-h/pl 2000
-h/pl 3001
-h/pl 50000
-h/pl 3001
-h/pl 2000
-h/pl 3001
-h/pl 50000
-h/pl 3001
-h/pl 3000
-h/pl 3001
-h/pl 900
-h/pl 800
-h/pl 900
-h/pl 800
-h/pl 900
-h/li
-h/file 37 hb/0037_0218.hb
-h/file 137 hb/0037_0218.hb
-cd
-h/li
-h/pl 3000
-h/pl 2000
-h/pl 2001
 zone 1 2
-h/pl 2000
-h/pl 2100
-h/pl 2000
-h/pl 1000
-h/pl 1100
-h/pl 45
-h/del *
-h/pl 3000
+zone 1 2(-10.:150.)
 zone
+h/pl 3000(-10.:150.)
+h/file 43 hb/0043_0218.hb
 h/pl 3000
-h/pl 3001
-h/pl 50010
-h/pl 45
-h/pl 3000
-h/pl 45
-h/del *
-h/pl 3000
-h/pl 45
-h/pl 46
-h/pl 45
-h/pl 3000
-h/pl 3000(-1.:200.)
-locate ! t
-h/del *
-h/pl 50010
-h/pl 50015
-h/li
-glob E
-h/li
-h/del *
-h/li
-exit
-*** End   of history file: Mon Feb 18 15:57:29 2019
+h/pl 5000(6.:10.)
+h/pl 50000(6.:10.)
+h/pl 50010(6.:10.)
+h/pl 50011(6.:10.)
+h/pl 50010(6.:10.)
+h/pl 50020(6.:10.)
+h/pl 50030(6.:10.)
+h/pl 50020(6.:10.)
+h/pl 50021(6.:10.)
+h/pl 50020(6.:10.)
+h/pl 50021(6.:10.)
+zone 22
+zone 2 2
+h/pl 50020(6.:10.)
+h/pl 50000(6.:10.)
+h/pl 50000(6.:10.)
+h/pl 50000(6.:10.)
+h/pl 50000(6.:10.)
+h/pl 50010(6.:10.)
+h/pl 50020(6.:10.)
+*** End   of history file: Mon Feb 18 19:04:41 2019
