@@ -1,52 +1,19 @@
-*** Begin of history file: Mon Feb 18 18:49:35 2019
-h/file 41 hb/0041.hb
-opt stat
-zone 2 2
-h/pl 50000(6.:10.)
-h/pl 10000(6.:10.)
-h/pl 50010(6.:10.)
-h/pl 50020(6.:10.)
-close 41
-h/file 41 hb/0041_0218.hb
-h/pl 50000(6.:10.)
-h/pl 50000(6.:10.)
-h/pl 50000(6.:10.)
-h/pl 50010(6.:10.)
-h/pl 50020(6.:10.)
-h/pl 50030(6.:10.)
-h/pl 50001(6.:10.)
-h/pl 50011(6.:10.)
-h/pl 50021(6.:10.)
-h/pl 50031(6.:10.)
-h/pl 3000
+*** Begin of history file: Tue Feb 19 13:47:12 2019
+h/file 37 hb/0037_0219.hb
+h/pl 3030
+h/pl 3030 colz
+h/pl 5030
+h/pl 50030
+locate ! t
+h/pl 50031
+locate ! t
+locate ! it
+h/pl 50031
+h/pl 50030
+locate ! it
+h/del *
 h/li
-zone 1 3
-h/pl 3000
-h/pl 3001
-zone 1 2
-zone 1 2(-10.:150.)
-zone
-h/pl 3000(-10.:150.)
-h/file 43 hb/0043_0218.hb
-h/pl 3000
-h/pl 5000(6.:10.)
-h/pl 50000(6.:10.)
-h/pl 50010(6.:10.)
-h/pl 50011(6.:10.)
-h/pl 50010(6.:10.)
-h/pl 50020(6.:10.)
-h/pl 50030(6.:10.)
-h/pl 50020(6.:10.)
-h/pl 50021(6.:10.)
-h/pl 50020(6.:10.)
-h/pl 50021(6.:10.)
-zone 22
-zone 2 2
-h/pl 50020(6.:10.)
-h/pl 50000(6.:10.)
-h/pl 50000(6.:10.)
-h/pl 50000(6.:10.)
-h/pl 50000(6.:10.)
-h/pl 50010(6.:10.)
-h/pl 50020(6.:10.)
-*** End   of history file: Mon Feb 18 19:04:41 2019
+h/pl 50030
+h/pl 50030
+q
+*** End   of history file: Tue Feb 19 14:02:21 2019

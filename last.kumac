@@ -1,0 +1,52 @@
+*** Begin of history file: Tue Feb 19 14:02:23 2019
+h/file 37 hb/0037_0219.hb
+h/pl 50030
+h/pl 50032
+opt stat
+h/pl 50032
+locate ! it
+h/pl 50032
+h/pl 50030
+h/pl 50032
+h/pl 50010
+h/pl 50012
+h/pl 50030
+h/pl 50032
+h/pl 50032 lego
+h/pl 50032
+h/pl 50032 colz
+h/pl 50032(7.:8.,7.:8.) colz
+locate ! it
+h/li
+h/pl 10001
+h/pl 10001 colz
+h/pl 10002 colz
+h/pl 10001 colz
+h/pl 100021 colz
+h/pl 10002 colz
+h/pl 10001 colz
+h/pl 10002 colz
+h/pl 50
+h/pl 170
+h/pl 171
+h/pl 172
+h/file 37 hb/0037_0220.hb
+close 37
+h/file 37 hb/0037_0220.hb
+h/li
+h/pl 50100
+h/pl 50101
+h/pl 50102
+h/pl 50103
+opt stat 111111
+h/pl 50101
+h/pl 50101h/del *
+h/del *
+h/pl 50101
+h/del *
+h/pl 50101
+h/pl 50100
+h/pl 50102
+h/pl 50103
+h/del *
+*** End   of history file: Wed Feb 20 12:55:47 2019
