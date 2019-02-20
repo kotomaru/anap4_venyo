@@ -88,8 +88,8 @@ int histdef(){
     for(j=0;j<3;j++){
       sprintf(hnam,"adccx-adccy vs tdccx-tdccy in 6alpha coin MOD%1d hit%d",i,j);
       HBOOK2(3030+3*i+j,hnam,64,-6.,10.,64,-20.,20.,0);
-      sprintf(hnam,"adccx vs tdccx-tdccy in 6alpha coin MOD%1d hit%d",i,j);
-      HBOOK2(3040+3*i+j,hnam,64,0.,10.,64,-20.,20.,0);
+      // sprintf(hnam,"adccx vs tdccx-tdccy in 6alpha coin MOD%1d hit%d",i,j);
+      // HBOOK2(3040+3*i+j,hnam,64,0.,10.,64,-20.,20.,0);
     }
   }
 

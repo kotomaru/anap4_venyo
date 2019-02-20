@@ -39,7 +39,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   double tpar[N_TDC][2];//for tdc calibration
   int tdc_cnt[N_TDC]={};
   int tdc_cnt_al[N_TDC]={};
-  short tdc_nn[2][2]={};
+  short tdc_nn[2][2]={};//[right &left][x & y]
   int hitch_tdc_odr[N_ADC_MOD][16][2]={{{0}}}; //3 hit tdc in order [2]=omote ura
   
   short tmpbuf[200];
@@ -406,118 +406,8 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   for(i=0;i<N_TDC1;i++){
     tdc_nn[(int)i/32][(i/16)%2]+=tdc_cnt[i];
   }
-  
-  //  make vector of Si pixels
-  short adc_ch[2][16]; // temporary adc channels
-  short pixx[N_ADC_MOD][N_ADC/2]; // temporary coordinates
-  short pixy[N_ADC_MOD][N_ADC/2];
-  short hit_c[N_ADC_MOD]; // temporary hits count of each Si
-  unsigned short p2=0; // hit count
-  unsigned short pn=0; // particle number
-  unsigned short pp[2]={};
-  unsigned short hit_ch[N_ADC_MOD][16][2]; // coordinates against pn
-  double hit_adc[N_ADC_MOD][16][2];
-  
-  for(i=0;i<2;i++){
-    for(j=0;j<16;j++){
-      adc_ch[i][j]=-1;
-      pixx[i][j]=-1;
-      pixy[i][j]=-1;
-    }
-    for(j=0;j<16;j++){
-      for(k=0;k<2;k++){
-	hit_ch[i][j][k]=-1;
-	hit_adc[i][j][k]=0.;
-      }
-    }
-  }
-  
-  unsigned short p[2]={};
-  
-  for(i=0;i<N_ADC_MOD;i++){ // loop modele 0,1
-    pn=0;
-    for(k=0;k<2;k++){
-      for(j=0;j<16;j++){
-	adc_ch[k][j]=j;
-      }
-    }
-    //    p[i]=(tdc_nn[i][0]>tdc_nn[i][1]) ? tdc_nn[i][0]-tdc_nn[i][1]:tdc_nn[i][1]-tdc_nn[i][0];
-    p[i] = abs(tdc_nn[i][0]-tdc_nn[i][1]);
-    switch(p[i]){
-    case 0: // same counts
-      for(j=0;j<N_ADC;j++){
-	if(tdc_cnt_al[32*i+j]>0){ // select ch
-	  adc2[i][j/16][j%16]=adcc_al[i][j];
-	}
-      }
-      for(n=0;n<2;n++){
-	for(j=0;j<16;j++){
-	  for(k=j+1;k<16;k++){
-	    if(adc2[i][n][j]<adc2[i][n][k]){
-	      tmp=adc2[i][n][j];
-	      num=adc_ch[n][j];
-	      adc2[i][n][j]=adc2[i][n][k];
-	      adc_ch[n][j]=adc_ch[n][k];
-	      adc2[i][n][k]=tmp;
-	      adc_ch[n][k]=num;
-	    }
-	  }
-	}
-      }
-      for(k=0;k<tdc_nn[i][0];k++){
-	hit_ch[i][pn][0]=adc_ch[0][k];
-	hit_ch[i][pn][1]=adc_ch[1][k];
-	hit_adc[i][pn][0]=adc2[i][0][k];
-	hit_adc[i][pn][1]=adc2[i][1][k];
-	pn++;
-      }
-      for(j=0;j<pn;j++){
-	HF2(50+i,hit_ch[i][j][0],hit_ch[i][j][1],1.0);
-      }
-      break;
-      /* ****************************************** */
-    /* case 1:   //diff 1 */
-    /*   for(j=0;j<N_ADC;j++){ */
-    /* 	if(tdc_cnt_al[32*i+j]>0){ // select ch */
-    /* 	  adc2[i][j/16][j%16]=adcc_al[i][j]; */
-    /* 	} */
-    /*   } */
-    /*   for(n=0;n<2;n++){ */
-    /* 	for(j=0;j<16;j++){ */
-    /* 	  for(k=j+1;k<16;k++){ */
-    /* 	    if(adc2[i][n][j]<adc2[i][n][k]){ */
-    /* 	      tmp=adc2[i][n][j]; */
-    /* 	      num=adc_ch[n][j]; */
-    /* 	      adc2[i][n][j]=adc2[i][n][k]; */
-    /* 	      adc_ch[n][j]=adc_ch[n][k]; */
-    /* 	      adc2[i][n][k]=tmp; */
-    /* 	      adc_ch[n][k]=num; */
-    /* 	    } */
-    /* 	  } */
-    /* 	} */
-    /*   } */
-    /*   for(n=0;n<2;n++){ */
-    /* 	for(k=0;k<tdc_nn[i][n];k++){ */
-    /* 	  hit_ch[i][pp[n]][0]=adc_ch[0][k]; */
-    /* 	  hit_ch[i][pp[n]][1]=adc_ch[1][k]; */
-    /* 	  hit_adc[i][pp[n]][0]=adc2[i][0][k]; */
-    /* 	  hit_adc[i][pp[n]][1]=adc2[i][1][k]; */
-    /* 	  pp[n]++; */
-    /* 	} */
-    /*   } */
-    /*   for(n=0;n<2;n++){ */
-    /* 	for(j=0;j<pp[n];j++){ */
-    /* 	  HF2(60+i,hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
-    /* 	} */
-    /*   } */
-    /*   break; */
 
-    default:
-      break;
-    }
-  }
-
-  double ex12c[2]={};
+    double ex12c[2]={};
   double vec12c[2][4]={};
   double vec[2][3][4]={};
   double rvec[3]={};
@@ -569,157 +459,223 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   }
   HF2(34,FLUG[0],FLUG[1],1.0);
   //making tdc Gate flug above
+
+  //  make vector of Si pixels
+  short adc_ch[2][16]; // temporary adc channels
+  short pixx[N_ADC_MOD][N_ADC/2]; // temporary coordinates
+  short pixy[N_ADC_MOD][N_ADC/2];
+  short hit_c[N_ADC_MOD]; // temporary hits count of each Si
+  unsigned short p2=0; // hit count
+  unsigned short pn[N_ADC_MOD]={0}; // particle number for 11 22 33
+  unsigned short pp[2]={};
+  unsigned short hit_ch[N_ADC_MOD][16][2]; // coordinates against pn
+  double hit_adc[N_ADC_MOD][16][2];
   
-  if((p[0]==0)&&(p[1]==0)){/* wether both mod's front_cnt=back_cnt */
-    if(tdc_nn[0][0]==tdc_nn[1][0]){/* wether mod_0_cnt==mod_1_cnt */
-      //int ichx,ichy;
-      p2=tdc_nn[0][0]; /* p = both mod's cnt */
-      //      printf("%u,",p2);
-      HF2(35,FLUG[0],FLUG[1],1.0);
-      if(FLUG[0]>=p2 && FLUG[1]>=p2){
-	HF2(36,FLUG[0],FLUG[1],1.0);
+  for(i=0;i<2;i++){
+    for(j=0;j<16;j++){
+      adc_ch[i][j]=-1;
+      pixx[i][j]=-1;
+      pixy[i][j]=-1;
+    }
+    for(j=0;j<16;j++){
+      for(k=0;k<2;k++){
+	hit_ch[i][j][k]=-1;
+	hit_adc[i][j][k]=0.;
       }
-      switch (p2){
-      case 1: // hitted 1 particles
-  	for(i=0;i<N_ADC_MOD;i++){
-	  for(j=0;j<p2;j++){
-	    HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0);
+    }
+  }
+  
+  unsigned short p[2]={};
+  
+  for(i=0;i<N_ADC_MOD;i++){ // loop modele 0,1
+    pn[i]=0;
+    for(k=0;k<2;k++){
+      for(j=0;j<16;j++){
+	adc_ch[k][j]=j;
+      }
+    }
+    p[i] = abs(tdc_nn[i][0]-tdc_nn[i][1]);
+  }
+  
+  switch(p[0]){
+  case 0: // same counts xy of right Si
+    switch(p[1]){
+    case 0://same cnt xy of both RL(1vs1,2vs2,3vs3)
+      for(i=0;i<N_ADC_MOD;i++){
+	for(j=0;j<N_ADC;j++){
+	  if(tdc_cnt_al[32*i+j]>0){ // select ch
+	    adc2[i][j/16][j%16]=adcc_al[i][j];
 	  }
 	}
-	break;
-      case 2: // hitted 2 particles
-  	for(i=0;i<N_ADC_MOD;i++){
-	  for(j=0;j<p2;j++){
-	    HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0);
-	  }
-	}
-	break;
-      case 3: // hitted 3 particles
-	if(FLUG[0]>=p2 && FLUG[1]>=p2){
-	  HF2(37,FLUG[0],FLUG[1],1.0);
-	}
-	
-	/* //3 particle order with tdcc */
-	for(i=0;i<N_ADC_MOD;i++){
-	  for(k=0;k<2;k++){//x & y
-	    for(j=0;j<p2;j++){
-	      hitch_tdc_odr[i][j][k]=hit_ch[i][j][k];
-	    }
-	    for(j=0;j<p2;j++){
-	      for(jj=j+1;jj<p2;jj++){
-		int nj,njj;
-		nj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0];
-		njj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][jj][k]][0];
-		if(nj>njj){
-		  //	    printf("%d %d,",j,jj);
-		  itmp=hitch_tdc_odr[i][j][k];
-		  hitch_tdc_odr[i][j][k]=hitch_tdc_odr[i][jj][k];
-		  hitch_tdc_odr[i][jj][k]=itmp;
-		}
+	for(n=0;n<2;n++){
+	  for(j=0;j<16;j++){
+	    for(k=j+1;k<16;k++){
+	      if(adc2[i][n][j]<adc2[i][n][k]){
+		tmp=adc2[i][n][j];
+		num=adc_ch[n][j];
+		adc2[i][n][j]=adc2[i][n][k];
+		adc_ch[n][j]=adc_ch[n][k];
+		adc2[i][n][k]=tmp;
+		adc_ch[n][k]=num;
 	      }
-	      //	printf("%d.%f,",i*N_ADC+k*16+hitch_tdc_odr[i][j][k],tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]);
+	    }
+	  }
+	}
+	for(k=0;k<tdc_nn[i][0];k++){
+	  hit_ch[i][pn[i]][0]=adc_ch[0][k];
+	  hit_ch[i][pn[i]][1]=adc_ch[1][k];
+	  hit_adc[i][pn[i]][0]=adc2[i][0][k];
+	  hit_adc[i][pn[i]][1]=adc2[i][1][k];
+	  pn[i]++;
+	}
+	for(j=0;j<pn[i];j++){
+	  HF2(50+i,hit_ch[i][j][0],hit_ch[i][j][1],1.0);
+	}
+      }
+      if(tdc_nn[0][0]==tdc_nn[1][0]){/* wether mod_0_cnt==mod_1_cnt */
+	//int ichx,ichy;
+	p2=tdc_nn[0][0]; /* p = both mod's cnt */
+	//      printf("%u,",p2);
+	/* HF2(35,FLUG[0],FLUG[1],1.0); */
+	/* if(FLUG[0]>=p2 && FLUG[1]>=p2){ */
+	/* 	HF2(36,FLUG[0],FLUG[1],1.0); */
+	/* } */
+	switch (p2){
+	case 1: // hitted 1 particles 1vs1
+	  for(i=0;i<N_ADC_MOD;i++){
+	    for(j=0;j<p2;j++){
+	      HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0);
+	    }
+	  }
+	break;
+	case 2: // hitted 2 particles 2 vs 2
+	  for(i=0;i<N_ADC_MOD;i++){
+	    for(j=0;j<p2;j++){
+	      HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0);
+	    }
+	  }
+	  break;
+	case 3: // hitted 3 particles 3vs3
+	  /* if(FLUG[0]>=p2 && FLUG[1]>=p2){ */
+	  /*   HF2(37,FLUG[0],FLUG[1],1.0); */
+	  /* } */
+	  /* //3 particle order with tdcc */
+	  for(i=0;i<N_ADC_MOD;i++){
+	    for(k=0;k<2;k++){//x & y
+	      for(j=0;j<p2;j++){
+		hitch_tdc_odr[i][j][k]=hit_ch[i][j][k];
+	      }
+	      for(j=0;j<p2;j++){
+		for(jj=j+1;jj<p2;jj++){
+		  int nj,njj;
+		  nj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0];
+		  njj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][jj][k]][0];
+		  if(nj>njj){
+		    //	    printf("%d %d,",j,jj);
+		    itmp=hitch_tdc_odr[i][j][k];
+		    hitch_tdc_odr[i][j][k]=hitch_tdc_odr[i][jj][k];
+		    hitch_tdc_odr[i][jj][k]=itmp;
+		  }
+		}
+		//	printf("%d.%f,",i*N_ADC+k*16+hitch_tdc_odr[i][j][k],tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]);
+	      }
+	    
+	      //3 alpha coincidence flug
+	      if((tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][1][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])>=coinmin
+		 &&(tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][2][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])<coinmax){
+		coinflug[i][k]=1;
+	      }
 	      
-	    }
-	    
-	    //3 alpha coincidence flug
-	    if((tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][1][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])>=coinmin
-	       &&(tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][2][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])<coinmax){
-	      coinflug[i][k]=1;
-	    }
-	    
-	    //hist of tdc difference between 3 alphas
-	    for(j=1;j<p2;j++){
-	      HF1(3000+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
-	      if(FLUG[0]>=p2 && FLUG[1]>=p2){
-		HF1(3010+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
-		if(coinflug[i][k]){
-		  HF1(3020+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
+	      //hist of tdc difference between 3 alphas
+	      for(j=1;j<p2;j++){
+		HF1(3000+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
+		if(FLUG[0]>=p2 && FLUG[1]>=p2){
+		  HF1(3010+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
+		  if(coinflug[i][k]){
+		    HF1(3020+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0);
+		  }
 		}
 	      }
 	    }
 	  }
-	}
 	
 	//hist of check for nombering 6alpha
-	for(i=0;i<N_ADC_MOD;i++){
-	  for(j=0;j<p2;j++){
-	    if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	  for(i=0;i<N_ADC_MOD;i++){
+	    for(j=0;j<p2;j++){
+	      if(FLUG[0]>=p2 && FLUG[1]>=p2){
+		if(coinflug[i][0]*coinflug[i][1]){//3 alpha coin x y
+		  if(coinflug[(i+1)%2][0]*coinflug[(i+1)%2][1]){//6alpha coin x y
+		    HF2(3030+3*i+j,hit_adc[i][j][0]-hit_adc[i][j][1],
+			tdcc_al[i*N_ADC+0*16+hit_ch[i][j][0]][0]-tdcc_al[i*N_ADC+1*16+hit_ch[i][j][1]][0],1.0);
+		    // HF2(3040+3*i+j,hit_adc[i][j][0],
+		    //	tdcc_al[i*N_ADC+0*16+hit_ch[i][j][0]][0]-tdcc_al[i*N_ADC+1*16+hit_ch[i][j][1]][0],1.0);
+		  }
+		}
+	      }
+	    }
+	  }
+	  
+	  /**!!!!invariant mass of 12C**/	  
+	  for(i=0;i<N_ADC_MOD;i++){
+	    //  printf("test8");
+	    for(j=0;j<p2;j++){
+	      ichx=hit_ch[i][j][0];
+	      ichy=hit_ch[i][j][1];
+	      ene0=hit_adc[i][j][0];
+	      ene1=hit_adc[i][j][1];
+	      ene_sum3a[i][0]=ene_sum3a[i][0]+hit_adc[i][j][0];//x
+	      ene_sum3a[i][1]+=hit_adc[i][j][1];//y
+	      
+	      HF2(10000+p2,20*(1-i)+ichx,ichy,1.0);
+	      if(FLUG[0]>=p2 && FLUG[1]>=p2){
+		if(coinflug[0][0]*coinflug[0][1]){//3 alpha coin x y right
+		  if(coinflug[1][0]*coinflug[1][1]){//6alpha coin x y
+		    HF2(10030+p2,20*(1-i)+ichx,ichy,1.0);
+		  }
+		}
+	      }
+	      
+	      vec[i][j][0]=ene0+mhe;
+	      
+	      rvec[0]=((double)ichx-7.5)*3.0;
+	      rvec[1]=(7.5-(double)ichy)*3.0;
+	      rvec[2]=l;
+	      
+	      unitvec(rvec,rvec);
+	      rotvec(rvec,&vec[i][j][1],1,pow(-1,i)*theta);
+	      
+	      phe=sqrt(vec[i][j][0]*vec[i][j][0]-mhe*mhe);
+	      vecadd(&vec[i][j][1],rvec,&vec[i][j][1],phe,0.0);
+	      vecadd4(vec[i][j],vec12c[i],vec12c[i],1,1);
+	      //	    printf("%d:%d  p:%8.3f ene:%8.3f\n",i,j,phe,ene0);
+	      //printf("%d:%d: %8.3f   \n",i,j,
+	      //	   sqrt(scapro4(vec[i][j],vec[i][j])));
+	    }
+	    ex12c[i]=sqrt(scapro4(vec12c[i],vec12c[i]))-m12c;
+	    //	  printf("ex:%8.3f\n",ex12c[i]);
+	    HF1(50000+i,ex12c[i],1.0);
+	    if(FLUG[0]>=p2 && FLUG[1]>=p2){//tdc gate
+	      HF1(50010+i,ex12c[i],1.0);
 	      if(coinflug[i][0]*coinflug[i][1]){//3 alpha coin x y
-		if(coinflug[(i+1)%2][0]*coinflug[(i+1)%2][1]){//6alpha coin x y
-		  HF2(3030+3*i+j,hit_adc[i][j][0]-hit_adc[i][j][1],
-		      tdcc_al[i*N_ADC+0*16+hit_ch[i][j][0]][0]-tdcc_al[i*N_ADC+1*16+hit_ch[i][j][1]][0],1.0);
-		  HF2(3040+3*i+j,hit_adc[i][j][0],
-		      tdcc_al[i*N_ADC+0*16+hit_ch[i][j][0]][0]-tdcc_al[i*N_ADC+1*16+hit_ch[i][j][1]][0],1.0);
+		HF1(50020+i,ex12c[i],1.0);
+		if(coinflug[(i+1)%2][0]*coinflug[(i+1)%2][1]){
+		  HF1(50030+i,ex12c[i],1.0);
+		  HF1(50100+2*i+0,ene_sum3a[i][0],1.0);
+		  HF1(50100+2*i+1,ene_sum3a[i][1],1.0);
 		}
 	      }
 	    }
 	  }
-	}
-	
-	
-	for(i=0;i<N_ADC_MOD;i++){
-	  //  printf("test8");
-	  for(j=0;j<p2;j++){
-	    ichx=hit_ch[i][j][0];
-	    ichy=hit_ch[i][j][1];
-	    ene0=hit_adc[i][j][0];
-	    ene1=hit_adc[i][j][1];
-	    ene_sum3a[i][0]=ene_sum3a[i][0]+hit_adc[i][j][0];//x
-	    ene_sum3a[i][1]+=hit_adc[i][j][1];//y
-	    
-	    HF2(10000+p2,20*(1-i)+ichx,ichy,1.0);
-	    if(FLUG[0]>=p2 && FLUG[1]>=p2){
-	      if(coinflug[0][0]*coinflug[0][1]){//3 alpha coin x y right
-		if(coinflug[1][0]*coinflug[1][1]){//6alpha coin x y
-		  HF2(10030+p2,20*(1-i)+ichx,ichy,1.0);
+	  HF2(50002,ex12c[0],ex12c[1],1.0);
+	  if(FLUG[0]>=p2 && FLUG[1]>=p2){
+	    HF2(50012,ex12c[0],ex12c[1],1.0);
+	    if(coinflug[0][0]*coinflug[0][1]){//3 alpha coin x y right
+	      if(coinflug[1][0]*coinflug[1][1]){//6alpha coin x y
+		HF2(50032,ex12c[0],ex12c[1],1.0);
+		for(i=0;i<N_TDC1;i++){
+		  HF1(45,tdcc_al[i][0],1.0);
+		  HF2(46,adcc_al[(int)i/32][(int)i%32],tdc_al[i][0]-tzero,1.0);
 		}
-	      }
-	    }
-	    
-	    vec[i][j][0]=ene0+mhe;
-	    
-	    rvec[0]=((double)ichx-7.5)*3.0;
-	    rvec[1]=(7.5-(double)ichy)*3.0;
-	    rvec[2]=l;
-	    
-	    unitvec(rvec,rvec);
-	    rotvec(rvec,&vec[i][j][1],1,pow(-1,i)*theta);
-	    
-	    phe=sqrt(vec[i][j][0]*vec[i][j][0]-mhe*mhe);
-	    vecadd(&vec[i][j][1],rvec,&vec[i][j][1],phe,0.0);
-	    vecadd4(vec[i][j],vec12c[i],vec12c[i],1,1);
-	    //	    printf("%d:%d  p:%8.3f ene:%8.3f\n",i,j,phe,ene0);
-	    //printf("%d:%d: %8.3f   \n",i,j,
-	    //	   sqrt(scapro4(vec[i][j],vec[i][j])));
-	  }
-	  ex12c[i]=sqrt(scapro4(vec12c[i],vec12c[i]))-m12c;
-	  //	  printf("ex:%8.3f\n",ex12c[i]);
-	  HF1(50000+i,ex12c[i],1.0);
-	  if(FLUG[0]>=p2 && FLUG[1]>=p2){//tdc gate
-	    HF1(50010+i,ex12c[i],1.0);
-	    if(coinflug[i][0]*coinflug[i][1]){//3 alpha coin x y
-	      HF1(50020+i,ex12c[i],1.0);
-	      if(coinflug[(i+1)%2][0]*coinflug[(i+1)%2][1]){
-		HF1(50030+i,ex12c[i],1.0);
-		HF1(50100+2*i+0,ene_sum3a[i][0],1.0);
-		HF1(50100+2*i+1,ene_sum3a[i][1],1.0);
-	      }
-	    }
-	  }
-	}
-	HF2(50002,ex12c[0],ex12c[1],1.0);
-	if(FLUG[0]>=p2 && FLUG[1]>=p2){
-	  HF2(50012,ex12c[0],ex12c[1],1.0);
-	  if(coinflug[0][0]*coinflug[0][1]){//3 alpha coin x y right
-	    if(coinflug[1][0]*coinflug[1][1]){//6alpha coin x y
-	      HF2(50032,ex12c[0],ex12c[1],1.0);
-	      for(i=0;i<N_TDC1;i++){
-		HF1(45,tdcc_al[i][0],1.0);
-		HF2(46,adcc_al[(int)i/32][(int)i%32],tdc_al[i][0]-tzero,1.0);
-		/* 	if((i<=15)||(i>=32&&i<=47)){ */
-		/* 	  HF1(47,tdcc_al[i][0],1.0); */
-		/* 	} */
-	      }
 		//all alpha check
 		/*    FILE *outfile; */
 		/*       outfile = fopen("dat/6alpha.dat","a"); */
@@ -735,16 +691,239 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 		/*   fprintf(outfile,"\n"); */
 		/*   fclose(outfile); */
 		/* } */
+	      }
 	    }
 	  }
+	  break;
+	default:
+	  break;
 	}
-	break;
-	
-      default:
-	break;
       }
+      break;
+      /*p[0],p[1]=0 finnish 1vs1 2vs2 3vs3 above */
+            
+    case 1:
+      break;
+    default:
+      break;
     }
+      /* ****************************************** */
+    /* case 1:   //diff 1 */
+    /*   for(j=0;j<N_ADC;j++){ */
+    /* 	if(tdc_cnt_al[32*i+j]>0){ // select ch */
+    /* 	  adc2[i][j/16][j%16]=adcc_al[i][j]; */
+    /* 	} */
+    /*   } */
+    /*   for(n=0;n<2;n++){ */
+    /* 	for(j=0;j<16;j++){ */
+    /* 	  for(k=j+1;k<16;k++){ */
+    /* 	    if(adc2[i][n][j]<adc2[i][n][k]){ */
+    /* 	      tmp=adc2[i][n][j]; */
+    /* 	      num=adc_ch[n][j]; */
+    /* 	      adc2[i][n][j]=adc2[i][n][k]; */
+    /* 	      adc_ch[n][j]=adc_ch[n][k]; */
+    /* 	      adc2[i][n][k]=tmp; */
+    /* 	      adc_ch[n][k]=num; */
+    /* 	    } */
+    /* 	  } */
+    /* 	} */
+    /*   } */
+    /*   for(n=0;n<2;n++){ */
+    /* 	for(k=0;k<tdc_nn[i][n];k++){ */
+    /* 	  hit_ch[i][pp[n]][0]=adc_ch[0][k]; */
+    /* 	  hit_ch[i][pp[n]][1]=adc_ch[1][k]; */
+    /* 	  hit_adc[i][pp[n]][0]=adc2[i][0][k]; */
+    /* 	  hit_adc[i][pp[n]][1]=adc2[i][1][k]; */
+    /* 	  pp[n]++; */
+    /* 	} */
+    /*   } */
+    /*   for(n=0;n<2;n++){ */
+    /* 	for(j=0;j<pp[n];j++){ */
+    /* 	  HF2(60+i,hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
+    /* 	} */
+    /*   } */
+    /*   break; */
+
+  default:
+    break;
   }
+
+  
+  /* if((p[0]==0)&&(p[1]==0)){/\* wether both mod's front_cnt=back_cnt *\/ */
+  /*   if(tdc_nn[0][0]==tdc_nn[1][0]){/\* wether mod_0_cnt==mod_1_cnt *\/ */
+  /*     //int ichx,ichy; */
+  /*     p2=tdc_nn[0][0]; /\* p = both mod's cnt *\/ */
+  /*     //      printf("%u,",p2); */
+  /*     /\* HF2(35,FLUG[0],FLUG[1],1.0); *\/ */
+  /*     /\* if(FLUG[0]>=p2 && FLUG[1]>=p2){ *\/ */
+  /*     /\* 	HF2(36,FLUG[0],FLUG[1],1.0); *\/ */
+  /*     /\* } *\/ */
+  /*     switch (p2){ */
+  /*     case 1: // hitted 1 particles */
+  /* 	for(i=0;i<N_ADC_MOD;i++){ */
+  /* 	  for(j=0;j<p2;j++){ */
+  /* 	    HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
+  /* 	  } */
+  /* 	} */
+  /* 	break; */
+  /*     case 2: // hitted 2 particles */
+  /* 	for(i=0;i<N_ADC_MOD;i++){ */
+  /* 	  for(j=0;j<p2;j++){ */
+  /* 	    HF2(10000+p2,20*(1-i)+hit_ch[i][j][0],hit_ch[i][j][1],1.0); */
+  /* 	  } */
+  /* 	} */
+  /* 	break; */
+  /*     case 3: // hitted 3 particles */
+  /* 	/\* if(FLUG[0]>=p2 && FLUG[1]>=p2){ *\/ */
+  /* 	/\*   HF2(37,FLUG[0],FLUG[1],1.0); *\/ */
+  /* 	/\* } *\/ */
+	
+  /* 	/\* //3 particle order with tdcc *\/ */
+  /* 	for(i=0;i<N_ADC_MOD;i++){ */
+  /* 	  for(k=0;k<2;k++){//x & y */
+  /* 	    for(j=0;j<p2;j++){ */
+  /* 	      hitch_tdc_odr[i][j][k]=hit_ch[i][j][k]; */
+  /* 	    } */
+  /* 	    for(j=0;j<p2;j++){ */
+  /* 	      for(jj=j+1;jj<p2;jj++){ */
+  /* 		int nj,njj; */
+  /* 		nj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]; */
+  /* 		njj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][jj][k]][0]; */
+  /* 		if(nj>njj){ */
+  /* 		  //	    printf("%d %d,",j,jj); */
+  /* 		  itmp=hitch_tdc_odr[i][j][k]; */
+  /* 		  hitch_tdc_odr[i][j][k]=hitch_tdc_odr[i][jj][k]; */
+  /* 		  hitch_tdc_odr[i][jj][k]=itmp; */
+  /* 		} */
+  /* 	      } */
+  /* 	      //	printf("%d.%f,",i*N_ADC+k*16+hitch_tdc_odr[i][j][k],tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]); */
+	      
+  /* 	    } */
+	    
+  /* 	    //3 alpha coincidence flug */
+  /* 	    if((tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][1][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])>=coinmin */
+  /* 	       &&(tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][2][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])<coinmax){ */
+  /* 	      coinflug[i][k]=1; */
+  /* 	    } */
+	    
+  /* 	    //hist of tdc difference between 3 alphas */
+  /* 	    for(j=1;j<p2;j++){ */
+  /* 	      HF1(3000+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0); */
+  /* 	      if(FLUG[0]>=p2 && FLUG[1]>=p2){ */
+  /* 		HF1(3010+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0); */
+  /* 		if(coinflug[i][k]){ */
+  /* 		  HF1(3020+i,tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0],1.0); */
+  /* 		} */
+  /* 	      } */
+  /* 	    } */
+  /* 	  } */
+  /* 	} */
+	
+  /* 	//hist of check for nombering 6alpha */
+  /* 	for(i=0;i<N_ADC_MOD;i++){ */
+  /* 	  for(j=0;j<p2;j++){ */
+  /* 	    if(FLUG[0]>=p2 && FLUG[1]>=p2){ */
+  /* 	      if(coinflug[i][0]*coinflug[i][1]){//3 alpha coin x y */
+  /* 		if(coinflug[(i+1)%2][0]*coinflug[(i+1)%2][1]){//6alpha coin x y */
+  /* 		  HF2(3030+3*i+j,hit_adc[i][j][0]-hit_adc[i][j][1], */
+  /* 		      tdcc_al[i*N_ADC+0*16+hit_ch[i][j][0]][0]-tdcc_al[i*N_ADC+1*16+hit_ch[i][j][1]][0],1.0); */
+  /* 		  HF2(3040+3*i+j,hit_adc[i][j][0], */
+  /* 		      tdcc_al[i*N_ADC+0*16+hit_ch[i][j][0]][0]-tdcc_al[i*N_ADC+1*16+hit_ch[i][j][1]][0],1.0); */
+  /* 		} */
+  /* 	      } */
+  /* 	    } */
+  /* 	  } */
+  /* 	} */
+	
+	
+  /* 	for(i=0;i<N_ADC_MOD;i++){ */
+  /* 	  //  printf("test8"); */
+  /* 	  for(j=0;j<p2;j++){ */
+  /* 	    ichx=hit_ch[i][j][0]; */
+  /* 	    ichy=hit_ch[i][j][1]; */
+  /* 	    ene0=hit_adc[i][j][0]; */
+  /* 	    ene1=hit_adc[i][j][1]; */
+  /* 	    ene_sum3a[i][0]=ene_sum3a[i][0]+hit_adc[i][j][0];//x */
+  /* 	    ene_sum3a[i][1]+=hit_adc[i][j][1];//y */
+	    
+  /* 	    HF2(10000+p2,20*(1-i)+ichx,ichy,1.0); */
+  /* 	    if(FLUG[0]>=p2 && FLUG[1]>=p2){ */
+  /* 	      if(coinflug[0][0]*coinflug[0][1]){//3 alpha coin x y right */
+  /* 		if(coinflug[1][0]*coinflug[1][1]){//6alpha coin x y */
+  /* 		  HF2(10030+p2,20*(1-i)+ichx,ichy,1.0); */
+  /* 		} */
+  /* 	      } */
+  /* 	    } */
+	    
+  /* 	    vec[i][j][0]=ene0+mhe; */
+	    
+  /* 	    rvec[0]=((double)ichx-7.5)*3.0; */
+  /* 	    rvec[1]=(7.5-(double)ichy)*3.0; */
+  /* 	    rvec[2]=l; */
+	    
+  /* 	    unitvec(rvec,rvec); */
+  /* 	    rotvec(rvec,&vec[i][j][1],1,pow(-1,i)*theta); */
+	    
+  /* 	    phe=sqrt(vec[i][j][0]*vec[i][j][0]-mhe*mhe); */
+  /* 	    vecadd(&vec[i][j][1],rvec,&vec[i][j][1],phe,0.0); */
+  /* 	    vecadd4(vec[i][j],vec12c[i],vec12c[i],1,1); */
+  /* 	    //	    printf("%d:%d  p:%8.3f ene:%8.3f\n",i,j,phe,ene0); */
+  /* 	    //printf("%d:%d: %8.3f   \n",i,j, */
+  /* 	    //	   sqrt(scapro4(vec[i][j],vec[i][j]))); */
+  /* 	  } */
+  /* 	  ex12c[i]=sqrt(scapro4(vec12c[i],vec12c[i]))-m12c; */
+  /* 	  //	  printf("ex:%8.3f\n",ex12c[i]); */
+  /* 	  HF1(50000+i,ex12c[i],1.0); */
+  /* 	  if(FLUG[0]>=p2 && FLUG[1]>=p2){//tdc gate */
+  /* 	    HF1(50010+i,ex12c[i],1.0); */
+  /* 	    if(coinflug[i][0]*coinflug[i][1]){//3 alpha coin x y */
+  /* 	      HF1(50020+i,ex12c[i],1.0); */
+  /* 	      if(coinflug[(i+1)%2][0]*coinflug[(i+1)%2][1]){ */
+  /* 		HF1(50030+i,ex12c[i],1.0); */
+  /* 		HF1(50100+2*i+0,ene_sum3a[i][0],1.0); */
+  /* 		HF1(50100+2*i+1,ene_sum3a[i][1],1.0); */
+  /* 	      } */
+  /* 	    } */
+  /* 	  } */
+  /* 	} */
+  /* 	HF2(50002,ex12c[0],ex12c[1],1.0); */
+  /* 	if(FLUG[0]>=p2 && FLUG[1]>=p2){ */
+  /* 	  HF2(50012,ex12c[0],ex12c[1],1.0); */
+  /* 	  if(coinflug[0][0]*coinflug[0][1]){//3 alpha coin x y right */
+  /* 	    if(coinflug[1][0]*coinflug[1][1]){//6alpha coin x y */
+  /* 	      HF2(50032,ex12c[0],ex12c[1],1.0); */
+  /* 	      for(i=0;i<N_TDC1;i++){ */
+  /* 		HF1(45,tdcc_al[i][0],1.0); */
+  /* 		HF2(46,adcc_al[(int)i/32][(int)i%32],tdc_al[i][0]-tzero,1.0); */
+  /* 		/\* 	if((i<=15)||(i>=32&&i<=47)){ *\/ */
+  /* 		/\* 	  HF1(47,tdcc_al[i][0],1.0); *\/ */
+  /* 		/\* 	} *\/ */
+  /* 	      } */
+  /* 		//all alpha check */
+  /* 		/\*    FILE *outfile; *\/ */
+  /* 		/\*       outfile = fopen("dat/6alpha.dat","a"); *\/ */
+  /* 		/\*       if(outfile == NULL){ *\/ */
+  /* 		/\* 	printf("cannot open output file\n"); *\/ */
+  /* 		/\* 	exit(1); *\/ */
+  /* 		/\*       } *\/ */
+  /* 		/\*       for() *\/ */
+  /* 		/\*       fprintf(outfile,"%d,%d,%f,", *\/ */
+  /* 		/\* 	      i,tdcc_al[i][0],adcc_al[(int)i/32][(int)i%32]); *\/ */
+  /* 		/\*     } *\/ */
+  /* 		/\*   } *\/ */
+  /* 		/\*   fprintf(outfile,"\n"); *\/ */
+  /* 		/\*   fclose(outfile); *\/ */
+  /* 		/\* } *\/ */
+  /* 	    } */
+  /* 	  } */
+  /* 	} */
+  /* 	break; */
+	
+  /*     default: */
+  /* 	break; */
+  /*     } */
+  /*   } */
+  /* } */
   /**** Data Analysis Above ***************/
   
   /*********** Booking here **********/
