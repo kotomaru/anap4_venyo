@@ -1,89 +1,27 @@
-*** Begin of history file: Tue Feb 19 14:02:23 2019
-h/file 37 hb/0037_0219.hb
-h/pl 50030
+*** Begin of history file: Thu Feb 21 15:51:43 2019
+h/file 37 hb/0037_0221.hb
+h/pl 500320
 h/pl 50032
+opt dtat
 opt stat
 h/pl 50032
-locate ! it
-h/pl 50032
-h/pl 50030
-h/pl 50032
-h/pl 50010
-h/pl 50012
-h/pl 50030
-h/pl 50032
-h/pl 50032 lego
-h/pl 50032
-h/pl 50032 colz
-h/pl 50032(7.:8.,7.:8.) colz
-locate ! it
-h/li
-h/pl 10001
-h/pl 10001 colz
-h/pl 10002 colz
-h/pl 10001 colz
-h/pl 100021 colz
-h/pl 10002 colz
-h/pl 10001 colz
-h/pl 10002 colz
-h/pl 50
-h/pl 170
-h/pl 171
-h/pl 172
-h/file 37 hb/0037_0220.hb
 close 37
-h/file 37 hb/0037_0220.hb
-h/li
-h/pl 50100
-h/pl 50101
-h/pl 50102
-h/pl 50103
-opt stat 111111
-h/pl 50101
-h/pl 50101h/del *
-h/del *
-h/pl 50101
-h/del *
-h/pl 50101
-h/pl 50100
-h/pl 50102
-h/pl 50103
-h/del *
-h/li
-h/pl 50100
-h/pl 50101
-h/pl 50102
-h/pl 50103
-zone 1 4
-h/pl 50100
-h/pl 50101
-h/pl 50102
-h/pl 50103
-h/pl 50104
-zone
-h/pl 50101
-h/pl 50102
-h/li
-h/pl 10001
-h/pl 10002
-h/pl 10003
-h/pl 50000
-h/pl 50010
-h/pl 50020
+h/file 37 hb/0037_0221.hb
+h/pl 50032
+h/pl 50022
 h/pl 50030
-h/pl 45
-h/pl 46
+h/pl 50020
+zone 1 2
+h/pl 50020
+h/pl 50021
+h/li
+exe ../../../tools/kumac/show1 800
+zone
+exe ../../../tools/kumac/show1 800
+exe ../../../tools/kumac/show1 1000
+h/li
+exe ../../../tools/kumac/show1 2000
 h/pl 45
 locate ! it
-h/pl 45
-h/file 37 hb/0037_0219.hb
-h/file 40 hb/0037_0220.hb
-h/file 47 hb/0037_0219.hb
-h/pl 45
-h/li
-h/pl 45
-cd //lin37
-cd //lun37
-h/pl 45
-q
-*** End   of history file: Wed Feb 20 15:39:19 2019
+locate ! it
+*** End   of history file: Thu Feb 21 16:14:17 2019

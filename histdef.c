@@ -24,7 +24,7 @@ int histdef(){
       //           HBOOK1(600+N_ADC*j+i,hnam,2048,0.,4096.,0);
       // HBOOK1(600+N_ADC*j+i,hnam,1024,0.,4096.,0);
       sprintf(hnam,"calib-ADC %s ch:%02d",mod[j],i);
-      //      HBOOK1(700+N_ADC*j+i,hnam,2048,0.,32.,0);
+      //      HBOOK1(700N_ADC*j+i,hnam,2048,0.,32.,0);
       HBOOK1(800+N_ADC*j+i,hnam,2048,-10.,64.,0);
       // sprintf(hnam,"calib-ADC %s ch:%02d with TDC Gate",mod[j],i);
       //HBOOK1(900+N_ADC*j+i,hnam,2048,-10.,64.,0);
@@ -116,9 +116,9 @@ int histdef(){
   HBOOK1(20004,"right and left front",32,0.,32.,0);
   HBOOK1(20005,"right and left back",32,0.,32.,0);
 
-  // HBOOK2(34,"No. of particle within Gate right vs left",10,0.,10.,10,0.,10.,0);
-  //HBOOK2(35,"No. of particle within Gate STRICT1 right vs left",10,0.,10.,10,0.,10.,0);
-  //HBOOK2(36,"No. of particle within Gate STRICT2 right vs left",10,0.,10.,10,0.,10.,0);
+  HBOOK2(34,"No. of particle within Gate right vs left",10,0.,10.,10,0.,10.,0);
+  HBOOK2(35,"No. of particle within Gate right vs left",10,0.,10.,10,0.,10.,0);
+  HBOOK2(36,"No. of particle within Gate STRICT2 right vs left",10,0.,10.,10,0.,10.,0);
   //HBOOK2(37,"No. of particle within Gate STRICT3 right vs left",10,0.,10.,10,0.,10.,0);
   HBOOK1(50000,"invariant mass of 12C mod 0 ",128,0.,16.,0);
   HBOOK1(50001,"invariant mass of 12C mod 1 ",128,0.,16.,0);
@@ -140,6 +140,7 @@ int histdef(){
     }
   HBOOK1(45,"all tdcc with all gate",256,-600.,600.,0);
   HBOOK2(46,"all adcc vs tdc with all gate",32,0.,10.,128,0.,8000.,0);
+  HBOOK1(47,"all tdcc with 3vs3 test",256,-600.,600.,0);
   // HBOOK1(47,"all tdcc with all gate only omote",256,-600.,600.,0);
   /*2018/06/08 homework */
   

@@ -65,7 +65,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   double dped[N_ADC_MOD][N_DUP];//241Ampedestal ADC array for calib [right or left][0~31 (ch)]
   double dAm[N_ADC_MOD][N_DUP];//241Am ADC array for calib [right or left][0~31 (ch)]
   
-  int sicnt[2];
+  int sicnt[N_ADC_MOD][2]={{}};//[][xy]
   /************* Clear Event Buffer *****************/
   /*
   for(i=0;i<N_QDC;i++) {
@@ -293,7 +293,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	    tdc[j][tdc_cnt[j]++]=t_measure;
 	  }
 	  else{
-	    tdc[j][tdc_cnt[j]]=0.;
+	    tdc[j][tdc_cnt[j]]=0;
 	  }
       	}
       	else{
@@ -321,7 +321,10 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   while(fscanf(ftdc,"%lf %lf",&tpar[i][0],&buff)!=EOF){
     if(i>=N_TDC1){break;}
     for(j=0;j<N_DUP;j++){
-      tdcc[i][j] = (tdc[i][j]-tpar[i][0]+3000-tzero)*tpar[i][1];
+      if(tdc[i][j]>0){
+	tdcc[i][j] = (tdc[i][j]-tpar[i][0]+3000-tzero)*tpar[i][1];
+      }
+      else{tdcc[i][j]=0.;}
     }
     // printf("%f %f\n",tpar[i][0],buff);
     i++;
@@ -383,7 +386,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   for(i=0;i<N_TDC1;i++){
     for(j=0;j<tdc_cnt_al[i];j++){
       for(k=j+1;k<tdc_cnt_al[i];k++){
-	if(tdcc_al[i][j]>tdcc_al[i][k]){
+	if(tdc_al[i][j]>tdc_al[i][k]){
 	  tmp_tdc=tdc_al[i][j];
 	  tdc_al[i][j]=tdc_al[i][k];
 	  tdc_al[i][k]=tmp_tdc;
@@ -395,8 +398,18 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
     }
   }
 
-
-//  divide adc into x and y axis
+   //si cnt for x+y
+  for(i=0;i<N_ADC_MOD;i++){
+    for(j=0;j<2;j++){
+      for(k=0;k<16;k++){
+	if(tdc_cnt_al[i*32+j*16+k]>0){
+	  sicnt[i][j]++;
+	}
+      }
+    }
+  }
+  
+  //  divide adc into x and y axis
   for(i=0;i<N_ADC_MOD;i++){
     for(j=0;j<N_ADC;j++){
       adc2[i][(int)j/16][j%16]=adcc_al[i][j];
@@ -407,7 +420,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
     tdc_nn[(int)i/32][(i/16)%2]+=tdc_cnt[i];
   }
 
-    double ex12c[2]={};
+  double ex12c[2]={};
   double vec12c[2][4]={};
   double vec[2][3][4]={};
   double rvec[3]={};
@@ -436,16 +449,17 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   int HFflug_tdcGate[N_TDC1]={};
   
   // flug for coincidence event
-  int coinflug[N_ADC_MOD][2]={};//[rightleft][xy]
+  int coinflug[N_ADC_MOD][2]={{0}};//[rightleft][xy]
   double coinmin=0.;
   double coinmax=20.;
   
   for(i=0;i<N_TDC1;i++){//TDC ch = 0~63
     HF2(33,i,tdc_cnt_al[i]*2,1.0);
-    if(tdc_al[i][0]!=0 && sicnt[i/32]>0
+    if(tdc_al[i][0]!=0 && sicnt[(int)i/32][(int)((i/16)%2)]>0
+       // if(tdc_al[i][0]!=0 && sicnt[(int)i/32][0]>0
        && (tdcc_al[i][0])>tdccmin && (tdcc_al[i][0])<tdccmax){
-      if(adcc_al[(int)i/32][(int)i%32] > adccmin
-	 && adcc_al[(int)i/32][(int)i%32] <adccmax){
+      if(adcc_al[(int)i/32][(int)i%32]>adccmin
+	 && adcc_al[(int)i/32][(int)i%32]<adccmax){
 	HFflug_tdcGate[i]=1;
 	flug[(int)i/32][(int)i%32]=1;
 	HF2(38,tdcc_al[i][0],i,1.0);
@@ -485,7 +499,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
     }
   }
   
-  unsigned short p[2]={};
+  unsigned short p[2]={100,100};
   
   for(i=0;i<N_ADC_MOD;i++){ // loop modele 0,1
     pn[i]=0;
@@ -494,13 +508,16 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	adc_ch[k][j]=j;
       }
     }
-    p[i] = abs(tdc_nn[i][0]-tdc_nn[i][1]);
+    if(tdc_nn[i][0]!=0||tdc_nn[i][1]){
+      p[i] = abs(tdc_nn[i][0]-tdc_nn[i][1]);
+    }
   }
   
   switch(p[0]){
   case 0: // same counts xy of right Si
     switch(p[1]){
     case 0://same cnt xy of both RL(1vs1,2vs2,3vs3)
+      HF2(35,FLUG[0],FLUG[1],1.0);
       for(i=0;i<N_ADC_MOD;i++){
 	for(j=0;j<N_ADC;j++){
 	  if(tdc_cnt_al[32*i+j]>0){ // select ch
@@ -556,6 +573,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	  }
 	  break;
 	case 3: // hitted 3 particles 3vs3
+	  HF2(36,FLUG[0],FLUG[1],1.0);
 	  /* if(FLUG[0]>=p2 && FLUG[1]>=p2){ */
 	  /*   HF2(37,FLUG[0],FLUG[1],1.0); */
 	  /* } */
@@ -567,7 +585,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	      }
 	      for(j=0;j<p2;j++){
 		for(jj=j+1;jj<p2;jj++){
-		  int nj,njj;
+		  double nj,njj;
 		  nj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0];
 		  njj=tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][jj][k]][0];
 		  if(nj>njj){
@@ -577,9 +595,8 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 		    hitch_tdc_odr[i][jj][k]=itmp;
 		  }
 		}
-		//	printf("%d.%f,",i*N_ADC+k*16+hitch_tdc_odr[i][j][k],tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][j][k]][0]);
 	      }
-	    
+
 	      //3 alpha coincidence flug
 	      if((tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][1][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])>=coinmin
 		 &&(tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][2][k]][0]-tdcc_al[i*N_ADC+k*16+hitch_tdc_odr[i][0][k]][0])<coinmax){
@@ -598,7 +615,10 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 	      }
 	    }
 	  }
-	
+	  for(i=0;i<N_TDC1;i++){
+	    HF1(47,tdcc_al[i][0],1.0);
+	  }
+
 	//hist of check for nombering 6alpha
 	  for(i=0;i<N_ADC_MOD;i++){
 	    for(j=0;j<p2;j++){
@@ -949,7 +969,7 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
 
   for(i=0;i<N_TDC1;i++){
     for(j=0;j<tdc_cnt_al[i];j++){
-      if(tdc_al[i][j]!=0 && sicnt[i/32]>0){
+      if(tdc_al[i][j]!=0 && sicnt[i/32][(i/16)%2]>0){
 	HF2(30,i,tdc_al[i][j]-tzero,1.0);
 	HF1(31,i,1.0);
 	HF1(1000+i,tdc_al[i][j]-tzero,1.0);
@@ -963,26 +983,20 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
   
   for(j=0;j<2;j++){
     for(i=0;i<N_ADC_MOD;i++){
-      sicnt[i]=0;
-      for(k=0;k<16;k++){
-	if(tdc_cnt[i*32+j*16+k]>0){
-	  sicnt[i]++;
-	}
-      }
-      HF1(20000+2*i+j,sicnt[i],1.0);
+      HF1(20000+2*i+j,sicnt[i][j],1.0);
     }
     if(j==0){
-      HF1(20004,sicnt[0]+sicnt[1],1.0);
+      HF1(20004,sicnt[0][j]+sicnt[1][j],1.0);
     }
   }
-  HF1(20005,sicnt[0]+sicnt[1],1.0);
+  HF1(20005,sicnt[0][1]+sicnt[1][1],1.0);
   
   //  check Si strip
   for(j=0;j<N_ADC_MOD;j++){
     for(i=0;i<N_ADC;i++){
       //      if(tdc[N_ADC*j+i][0]-tzero>0){
       if(tdc_cnt[j*N_ADC+i]>0.){
-	if(sicnt[j]>0){
+	if(sicnt[j][i/16]>0){
 	  HF2(10+j,i,adc[j][i],1.0);
 	}
 	HF1(10+N_ADC_MOD+j,i,1.0);
@@ -991,16 +1005,12 @@ int anaevt(int evtlen,unsigned short *rawbuf,struct p4dat *dat){
       if(tdc_cnt_al[j*N_ADC+i]>0.){
 	HF2(20+j,i,adcc_al[j][i],1.0);
       }
-      // HF1(500+N_ADC*j+i,adc[j][i],1.0);
-      if(sicnt[0]+sicnt[1]==1) {
-	HF1(700+N_ADC*j+i,adcc_al[j][i],1.0);
-	//	HF1(1000+j,i,1.0);
-	HF1(170+j,adcc[j][i],1.0);
-      }
-      // }
+     
+           // }
       if(tdc_cnt_al[j*N_ADC+i]>0.){
 	//	HF1(600+N_ADC*j+i,adc_al[j][i],1.0);
 	HF1(800+N_ADC*j+i,adcc_al[j][i],1.0);
+	HF1(170+j,adcc[j][i],1.0);
 	HF1(170+j+N_ADC_MOD,adcc_al[j][i],1.0);
       }
     }
