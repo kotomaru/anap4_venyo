@@ -1,27 +1,27 @@
-*** Begin of history file: Thu Feb 21 15:51:43 2019
-h/file 37 hb/0037_0221.hb
-h/pl 500320
-h/pl 50032
-opt dtat
+*** Begin of history file: Wed Feb 27 16:22:59 2019
+hfile 41 hb/0041_0227.hb
+h/file 41 hb/0041_0227.hb
+h/li
+h/pl 30
+h/pl 30 colz
+h/pl 40 colz
 opt stat
-h/pl 50032
+h/pl 40 colz
+hfile 37 hb/0037_0227_2.hb
+h/file 37 hb/0037_0227_2.hb
+h/pl 40 colz
+h/pl 40 colz
+h/pl 30 colz
+cd //lun37
+h/pl 30
+h/del *
+h/pl 30
 close 37
-h/file 37 hb/0037_0221.hb
-h/pl 50032
-h/pl 50022
-h/pl 50030
-h/pl 50020
-zone 1 2
-h/pl 50020
-h/pl 50021
-h/li
-exe ../../../tools/kumac/show1 800
-zone
-exe ../../../tools/kumac/show1 800
-exe ../../../tools/kumac/show1 1000
-h/li
-exe ../../../tools/kumac/show1 2000
-h/pl 45
-locate ! it
-locate ! it
-*** End   of history file: Thu Feb 21 16:14:17 2019
+h/file 37 hb/0037_0227_2.hb
+h/pl 30
+h/pl 30 colz
+close 37
+h/file 37 hb/0037_0227_3.hb
+h/pl 30 colz
+opt stat
+*** End   of history file: Wed Feb 27 16:33:22 2019

@@ -1,102 +1,52 @@
-*** Begin of history file: Thu Feb 21 17:23:59 2019
-h/file 37 hb/0037_0221.hb
-h/pl 45
-opt stat
-h/pl 46
-close 37
-h/file 37 hb/0037_0221.hb
-h/pl 45
-h/pl 46
-h/pl 50030
-h/pl 45
-h/pl 38
-h/pl 38 colz
-h/pl 38
+*** Begin of history file: Wed Feb 27 16:42:12 2019
+h/file 41 hb/0041_0227.hb
 opt logz
-h/pl 38
-h/pl 38 colz
-close 37
-h/file 37 hb/0037_0221.hb
-h/pl 45
-h/del *]
+h/pl 30 colz
+h/pl 40 colz
+opt linz
+h/pl 30 colz
+h/pl 30 colz
+opt logz
+h/pl 30 colz
+h/file 37 hb/0037_0227_3.hb
+h/pl 30 colz
+opt linz
+h/pl 30 colz
+h/pl 30 colz
+h/pl 40 colz
+opt logz
+h/pl 40 colz
+cd //lun41
 h/del *
-h/pl 45
-h/pl 47
-h/pl 46
-h/pl 45
+h/pl 40 colz
+h/file 42 hb/0041_0227_2.hb
+h/pl 40 colz
+h/pl 40 colz
+h/li
+cd
 close 37
-h/file 37 hb/0037_0225.hb
-h/del *
-h/pl 45
-h/pl 46
-h/pl 47
-h/pl 50030
-h/pl 50031
-h/pl 50032
+h/file 37 hb/0037_0227_3.hb
+h/li
+h/pl 3000
+opt stat
+h/pl 3000
+locate ! it
+h/pl 3000
+cd
+h/pl 5030
 h/pl 50030
 locate ! t
-hpl 5000
-hpl 50002
-h/pl 50002
-h/pl 50012
-h/pl 50022
-h/pl 50032
-h/pl 50031
+h/file 47 hb/0037_0227_x1.5.hb
 h/pl 50030
-locate ! it
-h/pl 50031
-locate ! it
-h/pl 50000
-h/pl 50001
-h/pl 50002
-h/pl 50002 colz
-h/pl 50032
-h/pl 50032 colz
-h/pl 50030 colz
-h/pl 3020
-h/pl 3021
-h/pl 3022
-h/li
-h/pl 3021
-h/pl 3020
-h/pl 3030
-h/pl 3031
-h/pl 3032
-h/pl 3033
-h/pl 3034
-h/pl 3035
-h/pl 10003
-h/pl 10003 colz
-h/pl 1000 colz
-h/pl 10000 colz
-h/pl 10001 colz
-h/pl 50100
-h/pl 50101
-h/pl 50102
-h/pl 50103
-h/pl 45
-h/del *
-h/pl 45
-close 37
-h/file 37 hb/0037_0225.hb
-h/pl 45
-h/pl 47
-h/pl 45
-h/pl 46
-h/pl 46 colz
-h/pl 50020
-h/pl 50021
-h/pl 50010
-h/pl 50011
-h/pl 50000
-h/pl 50001
-h/pl 50000
-h/pl 50000
-h/pl 50001
-h/pl 50031
-h/pl 50030
+locate ! t
 zone 1 2
 h/pl 50030
+cd //lin37
+cd //lun37
 h/pl 50030
-h/pl 50030(6.;10.)
-*** End   of history file: Mon Feb 25 11:43:56 2019
+h/file 57 hb/0037_0227_x-1.5.hb
+h/pl 50030
+zone 1 3
+h/pl 50030
+h/pl 50030(7.:9.)
+*** End   of history file: Thu Feb 28 09:56:35 2019
