@@ -25,9 +25,9 @@ int histdef(){
       // sprintf(hnam,"aligned ADC mod:%1d ch:%02d",j,i);
       //           HBOOK1(600+N_ADC*j+i,hnam,2048,0.,4096.,0);
       // HBOOK1(600+N_ADC*j+i,hnam,1024,0.,4096.,0);
-      sprintf(hnam,"calib-ADC %s ch:%02d",mod[j],i);
+      sprintf(hnam,"Energy %s ch%02d (MeV)",mod[j],i);
       //      HBOOK1(700N_ADC*j+i,hnam,2048,0.,32.,0);
-      HBOOK1(800+N_ADC*j+i,hnam,2048,-10.,64.,0);
+      HBOOK1(800+N_ADC*j+i,hnam,512,0.,64.,0);
       // sprintf(hnam,"calib-ADC %s ch:%02d with TDC Gate",mod[j],i);
       //HBOOK1(900+N_ADC*j+i,hnam,2048,-10.,64.,0);
       /// sprintf(hnam,"calib-ADC %s ch:%02d case not adcNo1",mod[j],i);
@@ -51,6 +51,8 @@ int histdef(){
   
   HBOOK2(30,"TDC ch-monitor",64,0.,64.,256,0.,12000.,0);
   HBOOK2(40,"TDC ch-monitor with ADC Gate",64,0.,64.,256,0.,12000.,0);
+  //tdcc ch\monitor with adc gate
+  HBOOK2(42,"TDCC ch",64,0.,64.,256,100.,1200.,0);
   
   HBOOK1(31,"TDC ch-counter",128,0.,128.,0);
   HBOOK1(41,"TDC ch-counter with TDC Gate",128,0.,128.,0);
@@ -115,6 +117,28 @@ int histdef(){
    }
 
   for(i=0;i<N_ADC_MOD;i++){
+    sprintf(hnam,"DIFF of TDCC in R=23,L=32 MOD%1d",i);
+    HBOOK1(3060+i,hnam,500,-100.,400.,0);
+    sprintf(hnam,"DIFF of TDCC in R=23,L=32 with 6alpha coin MOD%1d",i);
+    HBOOK1(3070+i,hnam,500,-100.,400.,0);
+    sprintf(hnam,"DIFF of TDCC in R=32,L=23 MOD%1d",i);
+    HBOOK1(3062+i,hnam,500,-100.,400.,0);
+    sprintf(hnam,"DIFF of TDCC in R=32,L=23 with 6alpha coin MOD%1d",i);
+    HBOOK1(3072+i,hnam,500,-100.,400.,0);
+   }
+
+  for(i=0;i<N_ADC_MOD;i++){
+    sprintf(hnam,"DIFF of TDCC in R=32,L=32 MOD%1d",i);
+    HBOOK1(3080+i,hnam,500,-100.,400.,0);
+    sprintf(hnam,"DIFF of TDCC in R=32,L=32 with 6alpha coin MOD%1d",i);
+    HBOOK1(3090+i,hnam,500,-100.,400.,0);
+    sprintf(hnam,"DIFF of TDCC in R=23,L=23 MOD%1d",i);
+    HBOOK1(3082+i,hnam,500,-100.,400.,0);
+    sprintf(hnam,"DIFF of TDCC in R=23,L=23 with 6alpha coin MOD%1d",i);
+    HBOOK1(3092+i,hnam,500,-100.,400.,0);
+  }
+
+  for(i=0;i<N_ADC_MOD;i++){
     sprintf(hnam,"MOD%1d sumENE 3a vs MOD%1d 12CENE x",i,(i+1)%2);
     HBOOK2(4000+2*i,hnam,123,-1.,40.,123,-1.,40.,0);
     sprintf(hnam,"MOD%1d sumENE 3a vs MOD%1d 12CENE y",i,(i+1)%2);
@@ -148,6 +172,14 @@ int histdef(){
   HBOOK2(10060+0,hnam,44,-4.,40.,48.,-16.,32.,0);
   sprintf(hnam,"hit pattern %1d x %1d R=23,L=33 6alpha coin",3,3);
   HBOOK2(10060+3,hnam,44,-4.,40.,48.,-16.,32.,0);
+  sprintf(hnam,"hit pattern %1d x %1d R=23,L=32 6alpha coin",3,3);
+  HBOOK2(10070+0,hnam,44,-4.,40.,48.,-16.,32.,0);
+  sprintf(hnam,"hit pattern %1d x %1d R=32,L=23 6alpha coin",3,3);
+  HBOOK2(10070+3,hnam,44,-4.,40.,48.,-16.,32.,0);
+  sprintf(hnam,"hit pattern %1d x %1d R=32,L=32 6alpha coin",3,3);
+  HBOOK2(10080,hnam,44,-4.,40.,48.,-16.,32.,0);
+  sprintf(hnam,"hit pattern %1d x %1d R=23,L=23 6alpha coin",3,3);
+  HBOOK2(10083,hnam,44,-4.,40.,48.,-16.,32.,0);
 
   HBOOK1(20000,"strip 0 front",16,0.,16.,0);
   HBOOK1(20001,"strip 0 back",16,0.,16.,0);
@@ -171,12 +203,13 @@ int histdef(){
   HBOOK1(50021,"invariant mass of 12C mod 1 with TDC-Gate 3alpha coin",128,0.,16.,0);
   HBOOK1(50030,"invariant mass of 12C mod 0 with TDC-Gate 6alpha coin",128,0.,16.,0);
   HBOOK1(50031,"invariant mass of 12C mod 1 with TDC-Gate 6alpha coin",128,0.,16.,0);
-  HBOOK2(50032,"invariant mass of 12C 0vs1 with TDC-Gate 6alpha coin ",128,0.,16.,128,0.,16.,0);
+  //6 alpha coin
+  HBOOK2(50032,"Excited Energy of 12C 0vs1",128,6.,12.,128,6.,12.,0);
   HBOOK2(50033,"invariant mass of 12C 0vs1 with TDC-Gate 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
-  HBOOK1(50040,"invariant mass of 12C mod 0 L=32",128,0.,16.,0);
-  HBOOK1(50041,"invariant mass of 12C mod 1 L=32",128,0.,16.,0);
-  HBOOK1(50042,"invariant mass of 12C mod 0 R=32",128,0.,16.,0);
-  HBOOK1(50043,"invariant mass of 12C mod 1 R=32",128,0.,16.,0);
+  /* HBOOK1(50040,"invariant mass of 12C mod 0 L=32",128,0.,16.,0); */
+  /* HBOOK1(50041,"invariant mass of 12C mod 1 L=32",128,0.,16.,0); */
+  /* HBOOK1(50042,"invariant mass of 12C mod 0 R=32",128,0.,16.,0); */
+  /* HBOOK1(50043,"invariant mass of 12C mod 1 R=32",128,0.,16.,0); */
   
   HBOOK1(50050,"invariant mass of 12C mod 0 L=32 6alpha coin",128,0.,16.,0);
   HBOOK1(50051,"invariant mass of 12C mod 1 L=32 6alpha coin",128,0.,16.,0);
@@ -187,10 +220,10 @@ int histdef(){
   HBOOK2(50057,"invariant mass of 12C 0vs1 L=32 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
   HBOOK2(50058,"invariant mass of 12C 0vs1 R=32 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
 
-  HBOOK1(50060,"invariant mass of 12C mod 0 L=23 L=33",128,0.,16.,0);
-  HBOOK1(50061,"invariant mass of 12C mod 1 L=23 L=33",128,0.,16.,0);
-  HBOOK1(50062,"invariant mass of 12C mod 0 R=23 L=33",128,0.,16.,0);
-  HBOOK1(50063,"invariant mass of 12C mod 1 R=23 L=33",128,0.,16.,0);
+  /* HBOOK1(50060,"invariant mass of 12C mod 0 L=23 L=33",128,0.,16.,0); */
+  /* HBOOK1(50061,"invariant mass of 12C mod 1 L=23 L=33",128,0.,16.,0); */
+  /* HBOOK1(50062,"invariant mass of 12C mod 0 R=23 L=33",128,0.,16.,0); */
+  /* HBOOK1(50063,"invariant mass of 12C mod 1 R=23 L=33",128,0.,16.,0); */
   
   HBOOK1(50070,"invariant mass of 12C mod 0 R=33 L=23 6alpha coin",128,0.,16.,0);
   HBOOK1(50071,"invariant mass of 12C mod 1 R=33 L=23 6alpha coin",128,0.,16.,0);
@@ -201,13 +234,37 @@ int histdef(){
   HBOOK2(50077,"invariant mass of 12C 0vs1 R=33 L=23 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
   HBOOK2(50078,"invariant mass of 12C 0vs1 R=23 L=33 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
 
-  
+  HBOOK1(50080,"invariant mass of 12C mod 0 R=23 L=32",128,0.,16.,0);
+  HBOOK1(50081,"invariant mass of 12C mod 1 R=23 L=32",128,0.,16.,0);
+  HBOOK1(50082,"invariant mass of 12C mod 0 R=32 L=23",128,0.,16.,0);
+  HBOOK1(50083,"invariant mass of 12C mod 1 R=32 L=23",128,0.,16.,0);
+  HBOOK1(50090,"invariant mass of 12C mod 0 R=23 L=32 6alpha coin",128,0.,16.,0);
+  HBOOK1(50091,"invariant mass of 12C mod 1 R=23 L=32 6alpha coin",128,0.,16.,0);
+  HBOOK1(50092,"invariant mass of 12C mod 0 R=32 L=23 6alpha coin",128,0.,16.,0);
+  HBOOK1(50093,"invariant mass of 12C mod 1 R=32 L=23 6alpha coin",128,0.,16.,0);
+ HBOOK2(50095,"invariant mass of 12C 0vs1 R=23 L=32 6alpha coin ",128,0.,16.,128,0.,16.,0);
+  HBOOK2(50096,"invariant mass of 12C 0vs1 R=32 L=23 6alpha coin ",128,0.,16.,128,0.,16.,0);
+  HBOOK2(50097,"invariant mass of 12C 0vs1 R=23 L=32 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
+  HBOOK2(50098,"invariant mass of 12C 0vs1 R=32 L=23 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
 
+  HBOOK1(50100,"invariant mass of 12C mod 0 R=32 L=32",128,0.,16.,0);
+  HBOOK1(50101,"invariant mass of 12C mod 1 R=32 L=32",128,0.,16.,0);
+  HBOOK1(50110,"invariant mass of 12C mod 0 R=32 L=32 6alpha coin",128,0.,16.,0);
+  HBOOK1(50111,"invariant mass of 12C mod 1 R=32 L=32 6alpha coin",128,0.,16.,0);
+  HBOOK2(50115,"invariant mass of 12C 0vs1 R=32 L=32 6alpha coin ",128,0.,16.,128,0.,16.,0);
+  HBOOK2(50116,"invariant mass of 12C 0vs1 R=32 L=32 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
+  HBOOK1(50102,"invariant mass of 12C mod 0 R=23 L=23",128,0.,16.,0);
+  HBOOK1(50103,"invariant mass of 12C mod 1 R=23 L=23",128,0.,16.,0);
+  HBOOK1(50112,"invariant mass of 12C mod 0 R=23 L=23 6alpha coin",128,0.,16.,0);
+  HBOOK1(50113,"invariant mass of 12C mod 1 R=23 L=23 6alpha coin",128,0.,16.,0);
+  HBOOK2(50117,"invariant mass of 12C 0vs1 R=23 L=23 6alpha coin ",128,0.,16.,128,0.,16.,0);
+  HBOOK2(50118,"invariant mass of 12C 0vs1 R=23 L=23 6alpha coin ",32,ex12C_min[0],ex12C_max[0],32,ex12C_min[1],ex12C_max[1],0);
+  
   for(i=0;i<N_ADC_MOD;i++){
   sprintf(hnam,"sum adcc of 3alpha in 6alphacoin MOD %1d x",i);
-  HBOOK1(50100+2*i+0,hnam,128,0.,32.,0);
+  HBOOK1(50200+2*i+0,hnam,128,0.,32.,0);
   sprintf(hnam,"sum adcc of 3alpha in 6alphacoin MOD %1d y",i);
-  HBOOK1(50100+2*i+1,hnam,128,0.,32.,0);
+  HBOOK1(50200+2*i+1,hnam,128,0.,32.,0);
     }
   HBOOK2(50300,"left xadc sum vs yadc single R=33 L=32",128,0.,30.,128,0.,30.,0);
   HBOOK2(50301,"right xadc sum vs yadc single R=32 L=33",128,0.,30.,128,0.,30.,0);
@@ -215,6 +272,14 @@ int histdef(){
   HBOOK2(50303,"right xadc single vs yadc sum R=23 L=33",128,0.,30.,128,0.,30.,0);
   HBOOK2(50305,"left xadc sum vs yadc single random",128,0.,30.,128,0.,30.,0);
   HBOOK2(50306,"right xadc sum vs yadc single randome",128,0.,30.,128,0.,30.,0);
+  
+  HBOOK2(50310,"R xadc-single vs yadc-sum R=23 L=32",128,0.,30.,128,0.,30.,0);
+  HBOOK2(50311,"L xadc-sum vs yadc-single R=23 L=32",128,0.,30.,128,0.,30.,0);
+  HBOOK2(50312,"L xadc-sum vs yadc-single R=32 L=23",128,0.,30.,128,0.,30.,0);
+  HBOOK2(50313,"R xadc-single vs yadc-sum R=32 L=23",128,0.,30.,128,0.,30.,0);
+  HBOOK2(50320,"R xadc-sum vs yadc-single R=32 L=32",128,0.,30.,128,0.,30.,0);
+  HBOOK2(50321,"L xadc-sum vs yadc-single R=32 L=32",128,0.,30.,128,0.,30.,0);
+
   HBOOK1(60000,"12C exENE R=3a,L=12C",128,-16.,32.,0);
   HBOOK1(60001,"12C exENE R=12C,L=3a",128,-16.,32.,0);
   HBOOK1(45,"all tdcc with all gate",256,-600.,600.,0);

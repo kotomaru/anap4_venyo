@@ -1,102 +1,77 @@
-*** Begin of history file: Fri Mar  1 10:07:38 2019
-h/file 39 hb/0039_0301.hb
-h/pl 50057
-h/pl 50057 colz
-h/pl 50058 colz
-opt stat
-h/pl 50077 colz
-h/pl 50078 colz
-h/file 37 hb/0037_0301.hb
-h/pl 50077 colz
-h/pl 50057 colz
-zone 2 2
-h/pl 50057 colz
-h/pl 50058 colz
-h/pl 50077 colz
-h/pl 50078 colz
-h/file 104 hb/0104.hb
-h/li
-h/pl 800
-zone
-h/pl 800
-h/pl 800(0.:10.)
-h/fit 800(5.:6.) g
-h/pl 800(0.:10.)
-h/li
-h/pl 600
-h/pl 600(400.:600.)
-h/pl 600(400.:700.)
-h/fit 600(520.:600.) g
-h/pl 600(400.:700.)
-h/pl 605(400.:700.)
-h/fit 605(520.:620.) g
-h/pl 605(400.:700.)
-h/pl 16(400.:700.)
-h/pl 616(400.:700.)
-h/fit 616(540.:600.) g
-h/pl 616(400.:700.)
-h/fit 617(540.:600.) g
-h/pl 617(400.:700.)
-h/fit 617(500.:560.) g
-h/pl 617(400.:700.)
-h/fit 602(540.:600.) g
-h/pl 602(400.:700.)
-h/fit 602(520.:600.) g
-h/pl 602(400.:700.)
-h/fit 608(520.:600.) g
-h/pl 608(400.:700.)
-h/pl 632(400.:700.)
-h/fit 632(520.:570.) g
-h/pl 632(400.:700.)
-h/fit 636(520.:570.) g
-h/pl 636(400.:700.)
-h/fit 636(550.:600.) g
-h/pl 636(400.:700.)
-h/fit 648(550.:600.) g
-h/pl 648(400.:700.)
-h/pl 656(400.:700.)
-h/fit 656(550.:590.) g
-h/pl 656(400.:700.)
-h/fit 601(520.:570.) g
-h/pl 601(400.:700.)
-h/fit 601(540.:600.) g
-h/pl 601(400.:700.)
-h/fit 604(540.:600.) g
-h/pl 604(400.:700.)
-h/fit 604(500.:600.) g
-h/pl 604(400.:700.)
-h/fit 606(500.:600.) g
-h/pl 606(400.:700.)
-h/fit 607(500.:600.) g
-h/pl 607(400.:700.)
-h/fit 603(500.:600.) g
-h/pl 603(400.:700.)
-h/pl 616(400.:700.)
-h/pl 617(400.:700.)
-exe ../../../tools/kumac/show1 600 400. 700.
-h/fit 618(500.:600.) g
-h/pl 618(400.:700.)
-h/fit 619(500.:600.) g
-h/pl 619(400.:700.)
-h/pl 37
-cd //lun37
-h/pl 10050
-h/pl 10000
-h/pl 10003
-h/pl 10003 colz
-f/del *
-h/pl 10003 colz
-h/pl 50033 colz
-h/del *
-h/pl 50033 colz
-h/pl 50057 colz
-h/pl 50033 colz
-zone 2 2
-h/pl 50057 colz
-h/pl 50058 colz
-h/pl 50077 colz
-h/pl 50078 colz
-zone
-h/pl 50078 colz
-cd //lun41
-*** End   of history file: Fri Mar  1 11:06:05 2019
+*** Begin of history file: Sun Mar  3 21:55:35 2019
+h/file 37 hb/0037_0303_122mev.hb
+h/file 37 hb/0037_0303_12mev.hb
+h/pl 50032(6.:9.5,6.:9.5)
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0. 0. 0.5
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.5 0.5 0.5
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.5 0.5 0.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.5 0.5 0.1
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.5 0.5 0.1
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.5 0.5 0.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.9 0.9 0.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.9 0.9 0.1
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 5 0.9 0.9 0.1
+color_table 5 0.95 0.95 0.1
+color_table 5 0.9 0.9 0.1
+color_table 5 0.95 0.95 0.1
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 7 0.95 0.95 0.3
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 7 0.95 0.3 0.3
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 7 0.95 0.5 0.3
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 7 0.95 0.7 0.3
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 3 0.95 0.5 0.3
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 3 0.95 0.3 0.3
+h/pl 50032(6.:9.5,6.:9.5) colz
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 6 1. 0.3 0.3
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 6 1. 0. 0.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 6 1. 0. 0.5
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 6 1. 0. 0.9
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 6 1. 0. 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 6 1. 0.4 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 6 1. 0.1 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 2 1. 0.1 0.8
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 2 1. 0.1 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 2 0.5 0.1 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 4 0.1 0.1 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 4 0.2 0.2 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 4 0.6 0.6 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 4 0. 0.7 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 4 0. 0. 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 2 0. 0.7 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 2 0. 1. 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 2 0. 0.95 1.
+h/pl 50032(6.:9.5,6.:9.5) colz
+color_table 2 0.1 0.95 1.
+*** End   of history file: Sun Mar  3 22:08:36 2019

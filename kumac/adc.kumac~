@@ -1,0 +1,16 @@
+macro adc
+set vsiz 0.40
+set hwid 6
+
+fort/file 20 picture/adc.ps
+grap/meta 20 -111
+cd //lun37
+set hcol 1
+h/pl 800(:15.)
+cd //lun56
+set hcol 2
+h/pl 66 s
+close 20
+sh gv adc.ps
+
+return

@@ -1,0 +1,177 @@
+*** Begin of history file: Mon Mar  4 11:41:43 2019
+h/file 37 hb/0037_0303_12mev.hb
+h/li
+h/pl 50081
+h/pl 50091
+h/file 43 hb/0043_0304_12mev.hb
+h/pl 5033
+h/pl 50033
+opt stat
+h/pl 50033
+h/pl 50057
+h/pl 50058
+h/pl 50077
+h/pl 50077 colz
+h/pl 50078 colz
+h/pl 50095
+h/pl 50096
+h/pl 50097
+h/pl 50098
+h/pl 50090
+h/pl 50080
+h/pl 50115
+h/pl 50117
+cd
+cd //lun37
+h/pl 45
+h/pl 50033
+h/pl 50032
+hfilee 41 hb/0041_0303.hb
+h/file 41 hb/0041_0303.hb
+h/file 41 hb/0041_0302.hb
+h/file 41 hb/0041_0303_12mev.hb
+h/li
+h/pl 50200
+h/pl 50201
+h/pl 50202
+h/pl 50203
+cd //lun37
+h/pl 50000
+h/pl 50000
+fort/file 20 picture/50000_37.ps
+grap/meta 20 -111
+h/pl 50000
+close 50000
+sh gv picture/50000_37.ps
+h/pl 50000
+set hcol2
+h/pl 50010 s
+h/pl 50000
+set hcol 2
+h/pl 50010 s
+set hcol 3
+h/pl 50020 s
+set hcol 4
+h/pl 50030 s
+h/pl 50000(5.:14.)
+set hcol 1
+h/pl 50000(5.:14.)
+fort/file 20 picture/50000_37.ps
+grap/meta 20 -111
+h/pl 50000(5.:14.)
+close 20
+fort/file 20 picture/50000_37_2.ps
+grap/meta 20 -111
+h/pl 50010(5.:14.)
+close 20
+fort/file 20 picture/50000_37_3.ps
+grap/meta 20 -111
+h/pl 50020(5.:14.)
+close 20
+fort/file 20 picture/50000_37_4.ps
+grap/meta 20 -111
+h/pl 50030(5.:14.)
+close 20
+fort/file 20 picture/50000_37_s.ps
+grap/meta 20 -111
+h/pl 50000(5.:14.)
+set hcol 4
+h/pl 50030(5.:14.)
+set hcol 1
+h/pl 50000(5.:14.)
+set hcol 4
+h/pl 50030(5.:14.) s
+close 20
+sh gv picture/50000_37_s.ps
+fort/file 20 picture/50000_37_s.ps
+grap/meta 20 -111
+set hcol 1
+h/pl 50000(5.:14.)
+set hcol 4
+h/pl 50030(5.:14.) s
+close 20
+sh gv picture/50000_37_s.ps
+fort/file 20 picture/50000_37.ps
+grap/meta 20 -111
+h/pl 50001(5.:14.)
+close 20
+fort/file 20 picture/50000_37.ps
+grap/meta 20 -111
+set hcol 1
+h/pl 50001(5.:14.)
+close 20
+fort/file 20 picture/50000_37.ps
+grap/meta 20 -111
+h/pl 50000(5.:14.)
+close 20
+fort/file 20 picture/50001_37.ps
+grap/meta 20 -111
+h/pl 50001(5.:14.)
+close 20
+fort/file 20 picture/50001_37_2.ps
+grap/meta 20 -111
+h/pl 50011(5.:14.)
+close 20
+fort/file 20 picture/50001_37_3.ps
+grap/meta 20 -111
+h/pl 50021(5.:14.)
+close 20
+fort/file 20 picture/50001_37_4.ps
+h/pl 50031(5.:14.)
+close 20
+fort/file 20 picture/50001_37_s.ps
+fort/file 20 picture/50001_37_4.ps
+close 20
+fort/file 20 picture/50001_37_4.ps
+grap/meta 20 -111
+h/pl 50031(5.:14.)
+close 20
+fort/file 20 picture/50001_37_s.ps
+grap/meta 20 -111
+h/pl 50001(5.:14.)
+set hcol 4
+h/pl 50031(5.:14.)
+close20
+close 20
+fort/file 20 picture/50001_37_s.ps
+grap/meta 20 -111
+set hcol 1
+h/pl 50001(5.:14.)
+set hcol 4
+h/pl 50031(5.:14.) s
+close 20
+h/file 46 hb/0046_0303.hb
+h/file 46 hb/0046_0304.hb
+h/file 46 hb/0046_0302.hb
+h/pl 50000
+h/file 47 hb/0047_0302.hb
+h/pl 50000
+h/file 43 hb/0043_0302.hb
+cd //lun43
+h/pl 50000
+set hcol 1
+h/pl 50000
+h/pl 50010 s
+h/pl 50020 s
+h/pl 50030 s
+h/pl 50000
+set hcol 2
+h/pl 50010 s
+zone 2 2
+h/pl 50000
+h/pl 50010
+h/pl 50020
+h/pl 50030
+set hcol 1
+fort/file 20 picture/50000_43_s.ps
+grap/file 20 -111
+grap/meta 20 -111
+h/pl 5000(5.:14.)
+h/pl 50000(5.:14.)
+h/pl 50010(5.:14.)
+h/pl 50020(5.:14.)
+h/pl 50030(5.:14.)
+close 20
+sh gv picture/50000_43_s.ps
+fort/file 20 picture/50001_43_s.ps
+*** End   of history file: Tue Mar  5 13:49:14 2019
